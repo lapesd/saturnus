@@ -1,14 +1,9 @@
 package main;
 
-public class Event {
+public abstract class Event {
 
-    private double time;
-    private int ID;
-
-    public Event(double time, int ID) {
-        this.time = time;
-        this.ID = ID;
-    }
+    protected double time;
+    protected int ID;
 
     public double getTime() {
         return this.time;
@@ -17,9 +12,5 @@ public class Event {
     public int getID() {
         return this.ID;
     }
-
-    public void execute(AbstractSimulator sim) {
-        System.out.println("Clock: " + sim.getTime());
-        System.out.println("Event Finished. ID: " + getID());
-    }
+    abstract void execute(AbstractSimulator sim);
 }
