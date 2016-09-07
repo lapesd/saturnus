@@ -8,6 +8,10 @@ public class Simulator extends AbstractSimulator {
         new Simulator().init();
     }
 
+    /**
+     * Initialize the simulator itself. Initialize the data nodes, insert events and
+     * execute them.
+     */
     public void init() {
         eventsQueue = new EventQueue();
         initDataNodes(2);
