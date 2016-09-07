@@ -2,10 +2,13 @@ package main;
 
 import java.util.Vector;
 
-
 public class EventQueue extends OrderedSet {
 
-    private Vector eventQueue = new Vector();
+    private Vector eventQueue;
+
+    public EventQueue() {
+        this.eventQueue = new Vector();
+    }
 
     @Override
     void insert(Event event) {
@@ -24,4 +27,5 @@ public class EventQueue extends OrderedSet {
     int queueSize() {
         return eventQueue.size();
     }
+
 }
