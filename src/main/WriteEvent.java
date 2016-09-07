@@ -8,9 +8,9 @@ public class WriteEvent extends Event {
     }
 
     @Override
-    public void execute(AbstractSimulator sim) {
+    public void execute(AbstractDataNode node) {
         System.out.println("Event Finished.");
-        System.out.println("Type: Write, ID: " + getID());
-        System.out.println("Clock: " + sim.getMainClock() + "\n");
+        System.out.println("Type: Write, ID: " + getID() + ", Executed on node: " + node.getID());
+        node.increaseNodeClock(this.time);
     }
 }

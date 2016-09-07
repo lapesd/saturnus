@@ -8,9 +8,9 @@ public class ReadEvent extends Event {
     }
 
     @Override
-    void execute(AbstractSimulator sim) {
+    void execute(AbstractDataNode node) {
         System.out.println("Event Finished.");
-        System.out.println("Type: Read, ID: " + getID());
-        System.out.println("Clock: " + sim.getMainClock() + "\n");
+        System.out.println("Type: Read, ID: " + getID() + " , Executed on node: " + node.getID());
+        node.increaseNodeClock(this.time);
     }
 }

@@ -12,5 +12,5 @@ public abstract class Event {
     public int getID() {
         return this.ID;
     }
-    abstract void execute(AbstractSimulator sim);
+    abstract void execute(AbstractDataNode node);
 }
