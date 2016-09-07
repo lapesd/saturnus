@@ -6,6 +6,10 @@ package main;
  */
 public class AbstractSimulator {
 
+    /**
+     * Next node to insert an event. For workload balance.
+     */
+    private int nextDataNode;
     private double mainClock;
     protected AbstractDataNode[] dataNodes;
     protected static OrderedSet eventsQueue;
@@ -27,6 +31,7 @@ public class AbstractSimulator {
         for (int i = 0; i < number; i++) {
             this.dataNodes[i] = new DataNode(i+1);
         }
+        this.nextDataNode = Random.randomInt(0, number-1);
     }
 
     /**
@@ -35,10 +40,11 @@ public class AbstractSimulator {
      */
     public void insertEvent(Event newEvent) {
         eventsQueue.insert(newEvent);
-        if(dataNodes[0].getQueueSize() > dataNodes[1].getQueueSize()) {
-            dataNodes[1].insertEvent(newEvent);
+        dataNodes[this.nextDataNode].insertEvent(newEvent);
+        if(nextDataNode == dataNodes.length-1) {
+            this.nextDataNode = 0;
         } else {
-            dataNodes[0].insertEvent(newEvent);
+            this.nextDataNode++;
         }
     }
 
