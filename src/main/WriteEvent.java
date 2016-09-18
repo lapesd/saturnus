@@ -1,20 +1,16 @@
 package main;
 
-import desmoj.core.simulator.Event;
+import desmoj.core.simulator.EventOf2Entities;
 import desmoj.core.simulator.Model;
-import desmoj.core.simulator.TimeSpan;
 
-public class WriteEvent extends Event<DataNode> {
-
-    private AbstractSimulator model;
+public class WriteEvent extends EventOf2Entities<Task, DataNode> {
 
     public WriteEvent(Model model) {
         super(model, "Write event", true);
-        this.model = (AbstractSimulator)model;
     }
 
     @Override
-    public void eventRoutine(DataNode dataNode) {
-        schedule(dataNode, new TimeSpan(model.getExponentialDist()));
+    public void eventRoutine(Task task, DataNode dataNode) {
+        sendTraceNote(dataNode + " executed a write event. From " + task);
     }
 }
