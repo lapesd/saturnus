@@ -1,16 +1,20 @@
 package main;
 
-public class WriteEvent extends Event {
+import desmoj.core.simulator.Event;
+import desmoj.core.simulator.Model;
+import desmoj.core.simulator.TimeSpan;
 
-    public WriteEvent(double time, int ID) {
-        this.time = time;
-        this.ID = ID;
+public class WriteEvent extends Event<DataNode> {
+
+    private AbstractSimulator model;
+
+    public WriteEvent(Model model) {
+        super(model, "Write event", true);
+        this.model = (AbstractSimulator)model;
     }
 
     @Override
-    public void execute(AbstractDataNode node) {
-        System.out.println("Event Finished.");
-        System.out.println("Type: Write, ID: " + getID() + ", Executed on node: " + node.getID());
-        node.increaseNodeClock(this.time);
+    public void eventRoutine(DataNode dataNode) {
+        schedule(dataNode, new TimeSpan(model.getExponentialDist()));
     }
 }

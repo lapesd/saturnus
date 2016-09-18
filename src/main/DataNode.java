@@ -1,100 +1,29 @@
 package main;
 
-import java.util.Vector;
+import desmoj.core.simulator.Entity;
+import desmoj.core.simulator.Model;
 
-public class DataNode implements AbstractDataNode {
+public class DataNode extends Entity {
 
-    private final int NodeID;
-    private double clock;
-    private Vector queue;
+    private int nodeID;
+    private boolean busy;
 
-    public DataNode(int NodeID) {
-        this.NodeID = NodeID;
-        this.queue = new Vector();
-        this.clock = 0;
-        System.out.println("Data Node up. ID: " + this.NodeID);
+    public DataNode(int nodeID, Model model) {
+        super(model, "DataNode", true);
+        this.nodeID = nodeID;
+        this.busy = false;
     }
 
-    /**
-     * Insert an event to the node queue of events.
-     * @param event - Event to be added.
-     */
-    @Override
-    public void insertEvent(Event event) {
-        this.queue.addElement(event);
+    public int getNodeID() {
+        return this.nodeID;
     }
 
-    /**
-     * Remove the first event of the node queue.
-     * @return The first evento on the queue.
-     */
-    @Override
-    public Event removeFirstEvent() {
-        return (Event)this.queue.remove(0);
+    public boolean isBusy() {
+        return this.busy;
     }
 
-    /**
-     * Executes all the events of a node.
-     */
-    @Override
-    public void executeAll() {
-        while(getQueueSize() != 0) {
-            Event newEvent = removeFirstEvent();
-            newEvent.execute(this);
-        }
-    }
-
-    /**
-     * Default getter for int NodeID.
-     * @return The ID of the node.
-     */
-    @Override
-    public int getID() {
-        return this.NodeID;
-    }
-
-    /**
-     * Default getter for double clock.
-     * @return The clock of the node.
-     */
-    @Override
-    public double getClock() {
-        return this.clock;
-    }
-
-    /**
-     * Increase the node clock with the value, passed by parameter.
-     * @param value - Value to increase.
-     */
-    @Override
-    public void increaseNodeClock(double value) {
-        this.clock += value;
-        System.out.println("Clock: " + getClock() + "\n");
-    }
-
-    /**
-     * Gets the size of the events queue.
-     * @return An int with the queue size.
-     */
-    @Override
-    public int getQueueSize() {
-        return this.queue.size();
-    }
-
-    /**
-     * Reset the node clock.
-     */
-    @Override
-    public void clearClock() {
-        this.clock = 0.0;
-    }
-
-    /**
-     * Reset the node event queue.
-     */
-    @Override
-    public void clearQueue() {
-        this.queue = new Vector();
+    public void setBusy(boolean state) {
+        this.busy = state;
     }
 
 }

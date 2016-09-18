@@ -1,78 +1,76 @@
 package main;
 
+import desmoj.core.dist.ContDistExponential;
+import desmoj.core.simulator.*;
+import java.util.concurrent.TimeUnit;
+
 /**
  * The "base" of the simulator. Has all methods to handle with the events,
  * queue of events, data nodes, etc.
  */
-public class AbstractSimulator {
+public class AbstractSimulator extends Model {
 
-    /**
-     * Next node to insert an event. For workload balance.
-     */
-    private int nextDataNode;
-    private double mainClock;
-    protected AbstractDataNode[] dataNodes;
-    protected static OrderedSet eventsQueue;
+    private static final int NODESAMOUNT = 4;
+    private static final int TASKNUMBER = 1;
 
-    /**
-     * Gets the main clock of the simulator.
-     * @return The time used by the simulator.
-     */
-    public double getMainClock() {
-        return this.mainClock;
+    // Queues
+    protected Queue<DataNode> dataNodesQueue;
+    private ContDistExponential exponentialDist;
+
+    public AbstractSimulator() {
+        super(null, "AbstractSimulator", true, false);
     }
 
-    /**
-     * Initialize and add the nodes to the "dataNodes" vector.
-     * @param number - Number of data nodes of the system.
-     */
-    public void initDataNodes(int number) {
-        dataNodes = new AbstractDataNode[number];
-        for (int i = 0; i < number; i++) {
-            this.dataNodes[i] = new DataNode(i+1);
-        }
-        this.nextDataNode = Random.randomInt(0, number-1);
-    }
 
-    /**
-     * Insert an event to a dataNode and to the queue of events.
-     * @param newEvent - Event to be added.
-     */
-    public void insertEvent(Event newEvent) {
-        eventsQueue.insert(newEvent);
-        dataNodes[this.nextDataNode].insertEvent(newEvent);
-        if(nextDataNode == dataNodes.length-1) {
-            this.nextDataNode = 0;
-        } else {
-            this.nextDataNode++;
+    @Override
+    public void init() {
+        this.exponentialDist = new ContDistExponential(this, "Event time", 6.0, true, false);
+        this.exponentialDist.setNonNegative(true);
+        this.dataNodesQueue = new Queue<DataNode>(this, "Data nodes.", true, true);
+
+        // Initialize the data nodes.
+        for (int i = 0; i < NODESAMOUNT; i++) {
+            dataNodesQueue.insert(new DataNode(i, this));
         }
     }
 
-    /**
-     * Remove all events from the queue and execute them on the data nodes.
-     * Besides that, synchronize the main clock with the events execution time.
-     */
-    public void executeEvents() {
-        while (eventsQueue.removeFirst() != null) {
-            for (int i = 0; i < dataNodes.length; i++) {
-                dataNodes[i].executeAll();
-            }
-        }
-        this.mainClock += clockSync();
-        System.out.println("Clock: " + getMainClock() + "\n");
+    @Override
+    public void doInitialSchedules() {
+        WriteEvent write = new WriteEvent(this);
+        write.schedule(dataNodesQueue.get(0), new TimeInstant(0));
     }
 
-    /**
-     * Gets the clock of all data nodes to synchronize with the main clock
-     * @return The largest clock, among the data nodes.
-     */
-    public double clockSync() {
-        double large = dataNodes[0].getClock();
-        dataNodes[0].clearClock();
-        for (int i = 1; i < dataNodes.length; i++) {
-            if(dataNodes[i].getClock() > large) { large = dataNodes[i].getClock(); }
-            dataNodes[i].clearClock();
-        }
-        return large;
+    @Override
+    public String description() {
+        return "Saturnus is an event based discrete simulator for parallel " +
+                "file systems.";
+    }
+
+    public int getNodesAmount() {
+        return this.NODESAMOUNT;
+    }
+
+    public double getExponentialDist() {
+        return this.exponentialDist.sample();
+    }
+
+
+    public static void main(String[] args) {
+        Model model = new AbstractSimulator();
+        Experiment exp = new Experiment("Experiment");
+        // Connect both model and experiment.
+        model.connectToExperiment(exp);
+
+        // Experiment parameters.
+        exp.setShowProgressBar(true);
+        exp.setShowProgressBarAutoclose(true);
+
+        exp.traceOn(new TimeInstant(0));
+        exp.stop(new TimeInstant(2, TimeUnit.MINUTES));
+
+        exp.start();
+        exp.report();
+        exp.finish();
+
     }
 }
