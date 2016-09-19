@@ -5,19 +5,19 @@ import desmoj.core.simulator.Model;
 
 public class DataNode extends Entity {
 
-    private boolean busy;
+    private double nodeClock;
 
     public DataNode(Model model) {
         super(model, "DataNode", true);
-        this.busy = false;
+        this.nodeClock = 0.0;
     }
 
-    public boolean isBusy() {
-        return this.busy;
+    public void setNodeClock(double time) {
+        this.nodeClock = time;
     }
 
-    public void setBusy(boolean state) {
-        this.busy = state;
+    public double getNodeClock() {
+        return this.nodeClock;
     }
 
 }
