@@ -24,6 +24,9 @@ public class AbstractSimulator extends Model {
         super(null, "AbstractSimulator", true, false);
     }
 
+    /**
+     * Initialize all the queues and distributions used through the simulator.
+     */
     @Override
     public void init() {
         this.exponentialWriteTime = new ContDistExponential(this, "Write time", 6.0, true, false);
@@ -44,6 +47,10 @@ public class AbstractSimulator extends Model {
         }
     }
 
+    /**
+     * Creates the initial schedules to the simulator. Besides that, send the requests
+     * to the nodes with the smaller workload.
+     */
     @Override
     public void doInitialSchedules() {
         Request request = new Request(REQUESTSIZE, this);
@@ -54,6 +61,10 @@ public class AbstractSimulator extends Model {
         }
     }
 
+    /**
+     * Provides a short description of the simulator.
+     * @return A description of the simulator.
+     */
     @Override
     public String description() {
         return "Saturnus is an event based discrete simulator for parallel " +
@@ -69,6 +80,10 @@ public class AbstractSimulator extends Model {
         return this.exponentialReadTime.sample();
     }
 
+    /**
+     * Find the best node to process a task/request into the data nodes queue.
+     * @return The best data note to execute a task.
+     */
     private DataNode workloadBalance() {
         DataNode aux = dataNodesQueue.get(0);
         for (int i = 1; i < NODESAMOUNT; i++) {
