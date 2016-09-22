@@ -3,7 +3,6 @@ package main;
 import desmoj.core.dist.ContDistExponential;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
-import desmoj.core.simulator.TimeInstant;
 
 /**
  * The "base" of the simulator. Has all methods to handle with the events,
@@ -47,14 +46,12 @@ public class AbstractSimulator extends Model {
 
     @Override
     public void doInitialSchedules() {
-        // Testing
         Request request = new Request(REQUESTSIZE, this);
-        request.schedule(tasksQueue.removeFirst(), dataNodesQueue.get(3));
-        request.schedule(tasksQueue.removeFirst(), dataNodesQueue.get(3));
-        request.schedule(tasksQueue.removeFirst(), dataNodesQueue.get(3));
-        request.schedule(tasksQueue.removeFirst(), dataNodesQueue.get(3));
-        request.schedule(tasksQueue.removeFirst(), dataNodesQueue.get(3));
-        request.schedule(tasksQueue.removeFirst(), dataNodesQueue.get(0));
+        for (int i = 0; i < TASKNUMBER; i++) {
+            DataNode bestNode = workloadBalance();
+            request.schedule(tasksQueue.removeFirst(), bestNode);
+            bestNode.setTasksNumber(bestNode.getTasksNumber() + 1);
+        }
     }
 
     @Override
@@ -68,8 +65,18 @@ public class AbstractSimulator extends Model {
         return this.exponentialWriteTime.sample();
     }
 
-    public TimeInstant getActualSimClock() {
-        return this.getExperiment().getSimClock().getTime();
+    public double getReadTime() {
+        return this.exponentialReadTime.sample();
+    }
+
+    private DataNode workloadBalance() {
+        DataNode aux = dataNodesQueue.get(0);
+        for (int i = 1; i < NODESAMOUNT; i++) {
+            if (dataNodesQueue.get(i).getTasksNumber() < aux.getTasksNumber()) {
+                aux = dataNodesQueue.get(i);
+            }
+        }
+        return aux;
     }
 
 }

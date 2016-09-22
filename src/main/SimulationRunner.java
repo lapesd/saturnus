@@ -20,6 +20,7 @@ public class SimulationRunner {
         exp.traceOn(new TimeInstant(0));
 
         exp.start();
+
         exp.report();
         exp.finish();
 
