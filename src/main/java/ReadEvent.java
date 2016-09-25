@@ -4,7 +4,7 @@ package main;
 import desmoj.core.simulator.EventOf2Entities;
 import desmoj.core.simulator.Model;
 
-public class ReadEvent extends EventOf2Entities<Task, DataNode>{
+public class ReadEvent extends EventOf2Entities<main.Task, main.DataNode>{
 
     public ReadEvent(Model model) {
         super(model, "Read event", true);

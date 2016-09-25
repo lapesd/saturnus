@@ -1,5 +1,3 @@
-package main;
-
 import desmoj.core.dist.ContDistExponential;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
