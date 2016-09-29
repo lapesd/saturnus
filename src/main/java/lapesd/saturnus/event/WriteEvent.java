@@ -4,14 +4,14 @@ import desmoj.core.simulator.EventOf2Entities;
 import desmoj.core.simulator.Model;
 import lapesd.saturnus.data.DataNode;
 
-public class WriteEvent extends EventOf2Entities<Task, DataNode> {
+public class WriteEvent extends EventOf2Entities<Request, DataNode> {
 
     public WriteEvent(Model model) {
         super(model, "Write event", true);
     }
 
     @Override
-    public void eventRoutine(Task task, DataNode dataNode) {
-        sendTraceNote(dataNode + " executed a write event. From " + task);
+    public void eventRoutine(Request request, DataNode dataNode) {
+        sendTraceNote(dataNode + " executed a write event. From " + request);
     }
 }
