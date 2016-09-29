@@ -4,7 +4,6 @@ import desmoj.core.dist.ContDistExponential;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
 import lapesd.saturnus.data.DataNode;
-import lapesd.saturnus.event.Task;
 import lapesd.saturnus.event.Request;
 
 /**
@@ -13,14 +12,16 @@ import lapesd.saturnus.event.Request;
  */
 public class AbstractSimulator extends Model {
 
-    private static final int NODESAMOUNT = 4;
     private static final int TASKNUMBER = 6;
-    private static final int REQUESTSIZE = 3;
+    private static final int SEGMENTSNUMBER = 2;
+    private static final int BLOCKSIZE = 2048;
+    private static final int STRIPESIZE = 64;
+    private static final int NODESAMOUNT = 4;
+    private static final int REQUESTSIZE = 1024;
 
     private ContDistExponential exponentialWriteTime;
     private ContDistExponential exponentialReadTime;
     protected Queue<DataNode> dataNodesQueue;
-    protected Queue<Task> tasksQueue;
 
 
     public AbstractSimulator() {
@@ -37,16 +38,10 @@ public class AbstractSimulator extends Model {
         this.exponentialReadTime = new ContDistExponential(this, "Read time", 2.0, true, false);
         this.exponentialReadTime.setNonNegative(true);
         this.dataNodesQueue = new Queue<DataNode>(this, "Data nodes", true, true);
-        this.tasksQueue = new Queue<Task>(this, "Tasks queue", true, true);
 
         // Initialize the data nodes.
         for (int i = 0; i < NODESAMOUNT; i++) {
             dataNodesQueue.insert(new DataNode(this));
-        }
-
-        // Initialize the tasks.
-        for (int i = 0; i < TASKNUMBER; i++) {
-            tasksQueue.insert(new Task(this));
         }
     }
 
@@ -56,12 +51,9 @@ public class AbstractSimulator extends Model {
      */
     @Override
     public void doInitialSchedules() {
-        Request request = new Request(REQUESTSIZE, this);
-        for (int i = 0; i < TASKNUMBER; i++) {
-            DataNode bestNode = workloadBalance();
-            request.schedule(tasksQueue.removeFirst(), bestNode);
-            bestNode.setTasksNumber(bestNode.getTasksNumber() + 1);
-        }
+        Request request = new Request(this, dataNodesQueue.first(), REQUESTSIZE, STRIPESIZE);
+        request.generateSubRequests();
+        request.executeRequest();
     }
 
     /**
@@ -81,20 +73,6 @@ public class AbstractSimulator extends Model {
 
     public double getReadTime() {
         return this.exponentialReadTime.sample();
-    }
-
-    /**
-     * Find the best node to process a task/request into the data nodes queue.
-     * @return The best data note to execute a task.
-     */
-    private DataNode workloadBalance() {
-        DataNode aux = dataNodesQueue.get(0);
-        for (int i = 1; i < NODESAMOUNT; i++) {
-            if (dataNodesQueue.get(i).getTasksNumber() < aux.getTasksNumber()) {
-                aux = dataNodesQueue.get(i);
-            }
-        }
-        return aux;
     }
 
 }

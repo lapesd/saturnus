@@ -1,32 +1,37 @@
 package lapesd.saturnus.event;
 
-import desmoj.core.simulator.EventOf2Entities;
+import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
-import desmoj.core.simulator.TimeInstant;
-import lapesd.saturnus.simulator.AbstractSimulator;
+import desmoj.core.simulator.TimeSpan;
 import lapesd.saturnus.data.DataNode;
+import lapesd.saturnus.simulator.AbstractSimulator;
 
+public class Request extends Entity {
 
-public class Request extends EventOf2Entities<Task, DataNode> {
-
-    private int requestSize;
+    private int stripeSize, requestSize, subRequestsAmount;
     private AbstractSimulator model;
+    private DataNode dataNode;
+    private SubRequest[] subRequestsQueue;
 
-    public Request(int requestSize, Model model) {
-        super(model, "New request", true);
+    public Request(Model model, DataNode dataNode, int requestSize, int stripeSize) {
+        super(model, "Request", true);
         this.model = (AbstractSimulator)model;
         this.requestSize = requestSize;
+        this.stripeSize = stripeSize;
+        this.subRequestsAmount = requestSize/stripeSize;
+        this.dataNode = dataNode;
+        this.subRequestsQueue = new SubRequest[subRequestsAmount];
     }
 
-    @Override
-    public void eventRoutine(Task task, DataNode dataNode) {
-        for (int i = 0; i < this.requestSize; i++) {
-            dataNode.setNodeClock(dataNode.getNodeClock() + model.getWriteTime());
-            // Using an explicit "Write Event" for testing.
-            WriteEvent write = new WriteEvent(this.model);
-            write.schedule(task, dataNode, new TimeInstant(dataNode.getNodeClock()));
+    public void executeRequest() {
+        for (int i = 0; i < subRequestsAmount; i++) {
+            subRequestsQueue[i].schedule(this, dataNode, new TimeSpan(dataNode.incrementNodeClock(1)));
         }
-        sendTraceNote("All requests from " + task + " scheduled.");
     }
 
+    public void generateSubRequests() {
+        for (int i = 0; i < subRequestsAmount; i++) {
+            subRequestsQueue[i] = new SubRequest(this.model, this.stripeSize);
+        }
+    }
 }
