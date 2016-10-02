@@ -19,6 +19,7 @@ public class SubRequest extends EventOf2Entities<Request, DataNode> {
     @Override
     public void eventRoutine(Request request, DataNode dataNode) {
         // Execute the write()/read()
-        sendTraceNote("Sub request executed. From " + request);
+        sendTraceNote("Sub request executed. From " + request +
+                      ". Segment: " + request.getSegmentID());
     }
 }

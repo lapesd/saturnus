@@ -21,8 +21,8 @@ public class AbstractSimulator extends Model {
 
     private ContDistExponential exponentialWriteTime;
     private ContDistExponential exponentialReadTime;
+    private int requestsPerBlock;
     protected Queue<DataNode> dataNodesQueue;
-
 
     public AbstractSimulator() {
         super(null, "AbstractSimulator", true, false);
@@ -37,6 +37,7 @@ public class AbstractSimulator extends Model {
         this.exponentialWriteTime.setNonNegative(true);
         this.exponentialReadTime = new ContDistExponential(this, "Read time", 2.0, true, false);
         this.exponentialReadTime.setNonNegative(true);
+        this.requestsPerBlock = BLOCKSIZE/REQUESTSIZE;
         this.dataNodesQueue = new Queue<DataNode>(this, "Data nodes", true, true);
 
         // Initialize the data nodes.
@@ -51,9 +52,11 @@ public class AbstractSimulator extends Model {
      */
     @Override
     public void doInitialSchedules() {
-        Request request = new Request(this, dataNodesQueue.first(), REQUESTSIZE, STRIPESIZE);
-        request.generateSubRequests();
-        request.executeRequest();
+        for (int i = 0; i < this.requestsPerBlock; i++) {
+            Request request = new Request(this, dataNodesQueue.first(), REQUESTSIZE, STRIPESIZE, 1);
+            request.generateSubRequests();
+            request.executeRequest();
+        }
     }
 
     /**

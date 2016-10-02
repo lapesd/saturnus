@@ -18,6 +18,5 @@ public class DataNode extends Entity {
 
     public double incrementNodeClock(double value) {
         return this.nodeClock += value;
-
     }
 }

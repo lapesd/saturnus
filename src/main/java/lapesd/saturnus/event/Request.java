@@ -8,18 +8,19 @@ import lapesd.saturnus.simulator.AbstractSimulator;
 
 public class Request extends Entity {
 
-    private int stripeSize, requestSize, subRequestsAmount;
+    private int stripeSize, requestSize, subRequestsAmount, segmentID;
     private AbstractSimulator model;
     private DataNode dataNode;
     private SubRequest[] subRequestsQueue;
 
-    public Request(Model model, DataNode dataNode, int requestSize, int stripeSize) {
+    public Request(Model model, DataNode dataNode, int requestSize, int stripeSize, int segmentID) {
         super(model, "Request", true);
         this.model = (AbstractSimulator)model;
         this.requestSize = requestSize;
         this.stripeSize = stripeSize;
-        this.subRequestsAmount = requestSize/stripeSize;
         this.dataNode = dataNode;
+        this.segmentID = segmentID;
+        this.subRequestsAmount = requestSize/stripeSize;
         this.subRequestsQueue = new SubRequest[subRequestsAmount];
     }
 
@@ -33,5 +34,9 @@ public class Request extends Entity {
         for (int i = 0; i < subRequestsAmount; i++) {
             subRequestsQueue[i] = new SubRequest(this.model, this.stripeSize);
         }
+    }
+
+    public int getSegmentID() {
+        return this.segmentID;
     }
 }
