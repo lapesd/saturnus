@@ -11,7 +11,6 @@ import lapesd.saturnus.event.Request;
  * queue of tasks, data nodes, etc.
  */
 public class AbstractSimulator extends Model {
-
     private static final int TASKNUMBER = 6;
     private static final int SEGMENTSNUMBER = 2;
     private static final int BLOCKSIZE = 2048;
@@ -53,10 +52,10 @@ public class AbstractSimulator extends Model {
     @Override
     public void doInitialSchedules() {
         for (int i = 0; i < this.requestsPerBlock; i++) {
-            Request request = new Request(this, dataNodesQueue.first(), REQUESTSIZE, STRIPESIZE, 1);
-            request.generateSubRequests();
-            request.executeRequest();
+            dataNodesQueue.first().insertRequestToQueue(
+                    new Request(this, dataNodesQueue.first(), REQUESTSIZE, STRIPESIZE, 1));
         }
+        executeAllNodes();
     }
 
     /**
@@ -78,4 +77,9 @@ public class AbstractSimulator extends Model {
         return this.exponentialReadTime.sample();
     }
 
+    private void executeAllNodes() {
+        for (int i = 0; i < NODESAMOUNT; i++) {
+            this.dataNodesQueue.get(i).execute();
+        }
+    }
 }
