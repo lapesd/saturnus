@@ -3,17 +3,17 @@ package lapesd.saturnus.data;
 import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
-import lapesd.saturnus.event.Request;
+import lapesd.saturnus.event.Task;
 
 public class DataNode extends Entity {
 
     private double nodeClock;
-    private Queue<Request> requestQueue;
+    private Queue<Task> tasksQueue;
 
     public DataNode(Model model) {
         super(model, "DataNode", true);
         this.nodeClock = 0.0;
-        this.requestQueue = new Queue<Request>(model, "Request queue: " + this, true, true);
+        this.tasksQueue = new Queue<Task>(model, "Task queue: " + this, true, true);
     }
 
     public double getNodeClock() {
@@ -24,18 +24,18 @@ public class DataNode extends Entity {
         return this.nodeClock += value;
     }
 
-    public void insertRequestToQueue(Request newRequest) {
-        this.requestQueue.insert(newRequest);
+    public void insertTaskToQueue(Task newTask) {
+        this.tasksQueue.insert(newTask);
     }
 
     public void execute() {
-        int queueSize = this.requestQueue.size();
+        int queueSize = this.tasksQueue.size();
         for (int i = 0; i < queueSize; i++) {
-            removeFirstRequest().executeRequest();
+            removeFirstTask().execute();
         }
     }
 
-    private Request removeFirstRequest() {
-        return this.requestQueue.removeFirst();
+    private Task removeFirstTask() {
+        return this.tasksQueue.removeFirst();
     }
 }
