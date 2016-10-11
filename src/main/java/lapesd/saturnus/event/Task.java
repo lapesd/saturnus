@@ -24,12 +24,12 @@ public class Task extends Entity{
         this.stripeSize = stripeSize;
         this.requestQueue = new Queue<Request>(model, "Request queue: " + this
                             + ", " + block.getSegment(), true, true);
-        initialRequests();
+        initRequests();
     }
 
-    private void initialRequests() {
+    private void initRequests() {
         for (int i = 0; i < this.requestsPerBlock; i++) {
-            requestQueue.insert(new Request(model, node, requestSize, stripeSize));
+            requestQueue.insert(new Request(model, this, node, requestSize, stripeSize));
         }
     }
 

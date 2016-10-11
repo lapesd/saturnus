@@ -6,6 +6,7 @@ import lapesd.saturnus.data.DataNode;
 import lapesd.saturnus.event.Block;
 import lapesd.saturnus.event.Segment;
 import lapesd.saturnus.event.Task;
+import lapesd.saturnus.math.Functions;
 
 /**
  * The "base" of the simulator. Has all methods to handle with the events,
@@ -13,7 +14,6 @@ import lapesd.saturnus.event.Task;
  */
 public class AbstractSimulator extends Model {
 
-    // TODO: conectar Segment -> block -> Task -> Request
     private static final String FILETYPE = "FPP";
     private static final String ACCESSPATTERN = "SEQUENTIAL";
     private static final int TASKNUMBER = 4;
@@ -56,17 +56,7 @@ public class AbstractSimulator extends Model {
      */
     @Override
     public void doInitialSchedules() {
-        if (FILETYPE == "FPP") {
-            if (ACCESSPATTERN == "SEQUENTIAL") {
-                for (int i = 0; i < segments.size(); i++) {
-                    for (int j = 0; j < TASKNUMBER; j++) {
-                        dataNodesQueue.first().insertTaskToQueue(new Task(this, dataNodesQueue.first(),
-                                new Block(this, segments.get(i)), requestsPerBlock, REQUESTSIZE, STRIPESIZE));
-                    }
-                }
-            }
-        }
-
+        scheduleTasks();
         executeAllNodes();
     }
 
@@ -84,6 +74,20 @@ public class AbstractSimulator extends Model {
     private void executeAllNodes() {
         for (int i = 0; i < NODESAMOUNT; i++) {
             this.dataNodesQueue.get(i).execute();
+        }
+    }
+
+    private void scheduleTasks() {
+        if (FILETYPE == "FPP" && ACCESSPATTERN == "SEQUENTIAL") {
+            int randomNode = Functions.randomInt(NODESAMOUNT);
+            for (int i = 0; i < segments.size(); i++) {
+                for (int j = 0; j < TASKNUMBER; j++) {
+                    Block fileBlock = new Block(this, segments.get(i));
+                    Task newTask = new Task(this, dataNodesQueue.get(randomNode),
+                            fileBlock, requestsPerBlock, REQUESTSIZE, STRIPESIZE);
+                    dataNodesQueue.get(randomNode).insertTaskToQueue(newTask);
+                }
+            }
         }
     }
 }
