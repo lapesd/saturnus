@@ -18,9 +18,9 @@ public class AbstractSimulator extends Model {
     private static final String ACCESSPATTERN = "SEQUENTIAL";
     private static final int TASKNUMBER = 4;
     private static final int SEGMENTSNUMBER = 2;
-    private static final int BLOCKSIZE = 2048;
     private static final int STRIPESIZE = 64;
     private static final int NODESAMOUNT = 4;
+    private static final int BLOCKSIZE = 2048;
     private static final int REQUESTSIZE = 1024;
 
     private int requestsPerBlock;
@@ -36,7 +36,7 @@ public class AbstractSimulator extends Model {
      */
     @Override
     public void init() {
-        this.requestsPerBlock = BLOCKSIZE/REQUESTSIZE;
+        this.requestsPerBlock = Functions.ceilInt((double)BLOCKSIZE/(double)REQUESTSIZE);
         this.dataNodesQueue = new Queue<DataNode>(this, "Data nodes", true, true);
         this.segments = new Queue<Segment>(this, "Segments", true, true);
 

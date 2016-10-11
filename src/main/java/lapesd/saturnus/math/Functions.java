@@ -9,4 +9,8 @@ public class Functions {
     public static int randomInt(int maxValue) {
         return rand.nextInt(maxValue);
     }
+
+    public static int ceilInt(double value) {
+        return (int)Math.ceil(value);
+    }
 }
