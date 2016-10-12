@@ -2,7 +2,7 @@ package lapesd.saturnus.math;
 
 import java.util.Random;
 
-public class Functions {
+public class MathFunctions {
 
     private static Random rand = new Random();
 

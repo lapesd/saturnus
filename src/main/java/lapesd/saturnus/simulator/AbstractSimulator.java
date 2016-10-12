@@ -3,10 +3,9 @@ package lapesd.saturnus.simulator;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
 import lapesd.saturnus.data.DataNode;
-import lapesd.saturnus.event.Block;
-import lapesd.saturnus.event.Segment;
+import lapesd.saturnus.data.Segment;
 import lapesd.saturnus.event.Task;
-import lapesd.saturnus.math.Functions;
+import lapesd.saturnus.math.MathFunctions;
 
 /**
  * The "base" of the simulator. Has all methods to handle with the events,
@@ -14,10 +13,11 @@ import lapesd.saturnus.math.Functions;
  */
 public class AbstractSimulator extends Model {
 
-    private static final String FILETYPE = "FPP";
+    private static final String FILETYPE = "SHARED";
     private static final String ACCESSPATTERN = "SEQUENTIAL";
     private static final int TASKNUMBER = 4;
     private static final int SEGMENTSNUMBER = 2;
+    private static final int STRIPECOUNT = 3;
     private static final int STRIPESIZE = 64;
     private static final int NODESAMOUNT = 4;
     private static final int BLOCKSIZE = 2048;
@@ -36,7 +36,7 @@ public class AbstractSimulator extends Model {
      */
     @Override
     public void init() {
-        this.requestsPerBlock = Functions.ceilInt((double)BLOCKSIZE/(double)REQUESTSIZE);
+        this.requestsPerBlock = MathFunctions.ceilInt((double)BLOCKSIZE/(double)REQUESTSIZE);
         this.dataNodesQueue = new Queue<DataNode>(this, "Data nodes", true, true);
         this.segments = new Queue<Segment>(this, "Segments", true, true);
 
@@ -79,15 +79,25 @@ public class AbstractSimulator extends Model {
 
     private void scheduleTasks() {
         if (FILETYPE == "FPP" && ACCESSPATTERN == "SEQUENTIAL") {
-            int randomNode = Functions.randomInt(NODESAMOUNT);
+            int randomNode = MathFunctions.randomInt(NODESAMOUNT);
             for (int i = 0; i < segments.size(); i++) {
                 for (int j = 0; j < TASKNUMBER; j++) {
-                    Block fileBlock = new Block(this, segments.get(i));
                     Task newTask = new Task(this, dataNodesQueue.get(randomNode),
-                            fileBlock, requestsPerBlock, REQUESTSIZE, STRIPESIZE);
+                            segments.get(i), requestsPerBlock, REQUESTSIZE, STRIPESIZE);
                     dataNodesQueue.get(randomNode).insertTaskToQueue(newTask);
                 }
             }
+        } else if(FILETYPE == "SHARED" && ACCESSPATTERN == "SEQUENTIAL") {
+            int actualNode = 0;
+            for (int i = 0; i < segments.size(); i++) {
+                for (int j = 0; j < TASKNUMBER; j++) {
+                    Task newTask = new Task(this, dataNodesQueue.get(actualNode%STRIPECOUNT),
+                            segments.get(i), requestsPerBlock, REQUESTSIZE, STRIPESIZE);
+                    dataNodesQueue.get(actualNode%STRIPECOUNT).insertTaskToQueue(newTask);
+                    actualNode++;
+                }
+            }
+
         }
     }
 }

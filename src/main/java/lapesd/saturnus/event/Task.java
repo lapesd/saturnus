@@ -3,7 +3,9 @@ package lapesd.saturnus.event;
 import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
+import lapesd.saturnus.data.Block;
 import lapesd.saturnus.data.DataNode;
+import lapesd.saturnus.data.Segment;
 import lapesd.saturnus.simulator.AbstractSimulator;
 
 public class Task extends Entity{
@@ -13,17 +15,16 @@ public class Task extends Entity{
     private int requestsPerBlock, requestSize, stripeSize;
     private Queue<Request> requestQueue;
 
-    public Task(Model model, DataNode node, Block block, int requestsPerBlock,
+    public Task(Model model, DataNode node, Segment segment, int requestsPerBlock,
                 int requestSize, int stripeSize) {
         super(model, "Task", true);
         this.model = (AbstractSimulator)model;
         this.node = node;
-        this.block = block;
+        this.block = new Block(model, segment);
         this.requestsPerBlock = requestsPerBlock;
         this.requestSize = requestSize;
         this.stripeSize = stripeSize;
-        this.requestQueue = new Queue<Request>(model, "Request queue: " + this
-                            + ", " + block.getSegment(), true, true);
+        this.requestQueue = new Queue<Request>(model, null, false, false);
         initRequests();
     }
 
