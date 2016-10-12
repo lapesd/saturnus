@@ -16,10 +16,6 @@ public class DataNode extends Entity {
         this.tasksQueue = new Queue<Task>(model, "Task queue: " + this, true, true);
     }
 
-    public double getNodeClock() {
-        return this.nodeClock;
-    }
-
     public double incrementNodeClock(double value) {
         return this.nodeClock += value;
     }

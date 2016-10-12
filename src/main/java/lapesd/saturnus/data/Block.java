@@ -1,4 +1,4 @@
-package lapesd.saturnus.event;
+package lapesd.saturnus.data;
 
 import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
@@ -9,5 +9,5 @@ public class Block extends Entity {
     public Block(Model model, Segment segment) {
         super(model, "Block", true);
         this.segment = segment;
-    }
+    }3
 }
