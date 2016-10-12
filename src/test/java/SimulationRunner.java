@@ -1,8 +1,7 @@
-package lapesd.saturnus.simulator;
-
 import desmoj.core.simulator.Experiment;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeInstant;
+import lapesd.saturnus.simulator.AbstractSimulator;
 
 public class SimulationRunner {
 

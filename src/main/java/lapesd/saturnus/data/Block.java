@@ -10,8 +10,4 @@ public class Block extends Entity {
         super(model, "Block", true);
         this.segment = segment;
     }
-
-    public Segment getSegment() {
-        return this.segment;
-    }
 }
