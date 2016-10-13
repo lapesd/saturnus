@@ -4,6 +4,7 @@ import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
 import lapesd.saturnus.data.DataNode;
 import lapesd.saturnus.data.Segment;
+import lapesd.saturnus.dataStructures.CircularList;
 import lapesd.saturnus.event.Task;
 import lapesd.saturnus.math.MathFunctions;
 
@@ -88,13 +89,17 @@ public class AbstractSimulator extends Model {
                 }
             }
         } else if(FILETYPE == "SHARED" && ACCESSPATTERN == "SEQUENTIAL") {
-            int actualNode = 0;
+            CircularList<DataNode> sharedNodes = new CircularList<DataNode>();
+            int[] nodesIndex = MathFunctions.randomInt(NODESAMOUNT, STRIPECOUNT);
+            for (int i = 0; i < STRIPECOUNT; i++) {
+                sharedNodes.add(dataNodesQueue.get(nodesIndex[i]));
+            }
             for (int i = 0; i < segments.size(); i++) {
                 for (int j = 0; j < TASKNUMBER; j++) {
-                    Task newTask = new Task(this, dataNodesQueue.get(actualNode%STRIPECOUNT),
+                    DataNode actualNode = sharedNodes.next();
+                    Task newTask = new Task(this, actualNode,
                             segments.get(i), requestsPerBlock, REQUESTSIZE, STRIPESIZE);
-                    dataNodesQueue.get(actualNode%STRIPECOUNT).insertTaskToQueue(newTask);
-                    actualNode++;
+                    actualNode.insertTaskToQueue(newTask);
                 }
             }
 
