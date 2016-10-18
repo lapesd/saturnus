@@ -12,7 +12,7 @@ public class Task extends Entity{
     private AbstractSimulator model;
     private DataNode node;
     private Block block;
-    private int requestsPerBlock, requestSize, stripeSize;
+    private int requestSize, stripeSize;
     private Queue<Request> requestQueue;
 
     public Task(Model model, DataNode node, Segment segment, int requestsPerBlock,
@@ -21,15 +21,14 @@ public class Task extends Entity{
         this.model = (AbstractSimulator)model;
         this.node = node;
         this.block = new Block(model, segment);
-        this.requestsPerBlock = requestsPerBlock;
         this.requestSize = requestSize;
         this.stripeSize = stripeSize;
         this.requestQueue = new Queue<Request>(model, null, false, false);
-        initRequests();
+        initRequests(requestsPerBlock);
     }
 
-    private void initRequests() {
-        for (int i = 0; i < this.requestsPerBlock; i++) {
+    private void initRequests(int requestsPerBlock) {
+        for (int i = 0; i < requestsPerBlock; i++) {
             requestQueue.insert(new Request(model, this, node, requestSize, stripeSize));
         }
     }

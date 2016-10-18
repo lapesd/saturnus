@@ -2,7 +2,6 @@ package lapesd.saturnus.event;
 
 import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
-import desmoj.core.simulator.TimeSpan;
 import lapesd.saturnus.data.DataNode;
 import lapesd.saturnus.simulator.AbstractSimulator;
 
@@ -26,9 +25,10 @@ public class Request extends Entity {
 
     public void executeRequest() {
         for (int i = 0; i < subRequestsAmount; i++) {
-            SubRequest newSubRequests = new SubRequest(this.model, this.stripeSize);
-            newSubRequests.schedule(this, dataNode, new TimeSpan(dataNode.incrementNodeClock(1)));
+            SubRequest newSubRequests = new SubRequest(model, this, stripeSize);
+            dataNode.insertSubRequest(newSubRequests);
         }
+        dataNode.execute();
     }
 
     public Task getTask() {

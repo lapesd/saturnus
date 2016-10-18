@@ -85,7 +85,7 @@ public class AbstractSimulator extends Model {
                 for (int j = 0; j < TASKNUMBER; j++) {
                     Task newTask = new Task(this, dataNodesQueue.get(randomNode),
                             segments.get(i), requestsPerBlock, REQUESTSIZE, STRIPESIZE);
-                    dataNodesQueue.get(randomNode).insertTaskToQueue(newTask);
+                    newTask.execute();
                 }
             }
         } else if(FILETYPE == "SHARED" && ACCESSPATTERN == "SEQUENTIAL") {
@@ -99,7 +99,7 @@ public class AbstractSimulator extends Model {
                     DataNode actualNode = sharedNodes.next();
                     Task newTask = new Task(this, actualNode,
                             segments.get(i), requestsPerBlock, REQUESTSIZE, STRIPESIZE);
-                    actualNode.insertTaskToQueue(newTask);
+                    newTask.execute();
                 }
             }
 
