@@ -27,19 +27,32 @@ public class Task extends Entity{
         initRequests(requestsPerBlock);
     }
 
+    /**
+     * Add 'n' requests into the request queue, where the 'n' is the
+     * number of requests per block.
+     * @param requestsPerBlock
+     */
     private void initRequests(int requestsPerBlock) {
         for (int i = 0; i < requestsPerBlock; i++) {
             requestQueue.insert(new Request(model, this, node, requestSize, stripeSize));
         }
     }
 
+    /**
+     * 'Walks' through the request queue and schedule it. That means,
+     * generate the sub requests and execute them.
+     */
     public void execute() {
         int queueSize = this.requestQueue.size();
         for (int i = 0; i < queueSize; i++) {
-            removeFirstRequest().executeRequest();
+            removeFirstRequest().scheduleRequest();
         }
     }
 
+    /**
+     * Remove the first element of request queue.
+     * @return The removed element
+     */
     private Request removeFirstRequest() {
         return this.requestQueue.removeFirst();
     }

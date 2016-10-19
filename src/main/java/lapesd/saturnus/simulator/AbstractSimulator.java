@@ -14,6 +14,15 @@ import lapesd.saturnus.math.MathFunctions;
  */
 public class AbstractSimulator extends Model {
 
+
+    // TODO: Documentação
+    /*
+        OBS: Se tratando de enviar Sub Req. para os nodos, como fazer a 'simetria'
+    entre segmentos? Cada nodo terá de executar as mesmas Sub Reqisisções?
+     */
+
+
+
     private static final String FILETYPE = "SHARED";
     private static final String ACCESSPATTERN = "SEQUENTIAL";
     private static final int TASKNUMBER = 4;
@@ -33,7 +42,8 @@ public class AbstractSimulator extends Model {
     }
 
     /**
-     * Initialize all the queues and distributions used through the simulator.
+     * Initialize all the queues, nodes and distributions used through the
+     * simulator. All the inicial settings are made here.
      */
     @Override
     public void init() {
@@ -52,8 +62,8 @@ public class AbstractSimulator extends Model {
     }
 
     /**
-     * Creates the initial schedules to the simulator. Besides that, send the requests
-     * to the nodes with the smaller workload.
+     * Creates the initial schedules to the simulator and send the signal
+     * to execute them.
      */
     @Override
     public void doInitialSchedules() {
@@ -71,13 +81,21 @@ public class AbstractSimulator extends Model {
                 "file systems.";
     }
 
-
+    /**
+     * 'Walks' through the data nodes queue and execute all actions
+     * scheduled at each node(sub request, request, etc.)
+     */
     private void executeAllNodes() {
         for (int i = 0; i < NODESAMOUNT; i++) {
             this.dataNodesQueue.get(i).execute();
         }
     }
 
+    /**
+     * Schedule the nodes according the parameters 'FILETYPE' and
+     * 'ACCESPATTERN'. To all 4 combinations, the simulator needs to perform
+     * a different action.
+     */
     private void scheduleTasks() {
         if (FILETYPE == "FPP" && ACCESSPATTERN == "SEQUENTIAL") {
             int randomNode = MathFunctions.randomInt(NODESAMOUNT);

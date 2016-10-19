@@ -23,15 +23,18 @@ public class Request extends Entity {
         this.subRequestsAmount = requestSize/stripeSize;
     }
 
-    public void executeRequest() {
+    public Task getTask() {
+        return this.task;
+    }
+
+    /**
+     * Creates sub requests and insert the into the request data node.
+     */
+    public void scheduleRequest() {
         for (int i = 0; i < subRequestsAmount; i++) {
             SubRequest newSubRequests = new SubRequest(model, this, stripeSize);
             dataNode.insertSubRequest(newSubRequests);
         }
-        dataNode.execute();
     }
 
-    public Task getTask() {
-        return this.task;
-    }
 }

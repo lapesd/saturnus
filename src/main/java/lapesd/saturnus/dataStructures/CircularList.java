@@ -6,10 +6,7 @@ public class CircularList<T> extends ArrayList<T> {
     private static int lastAccess = -1;
 
     public T get(int index) {
-        if (index == size()) {
-            index = 0;
-        }
-        return super.get(index);
+        return super.get(index % size());
     }
 
     public T next() {
