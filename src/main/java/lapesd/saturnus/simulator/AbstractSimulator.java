@@ -14,8 +14,6 @@ import lapesd.saturnus.math.MathFunctions;
  */
 public class AbstractSimulator extends Model {
 
-
-    // TODO: Documentação
     /*
         OBS: Se tratando de enviar Sub Req. para os nodos, como fazer a 'simetria'
     entre segmentos? Cada nodo terá de executar as mesmas Sub Reqisisções?
@@ -25,9 +23,9 @@ public class AbstractSimulator extends Model {
 
     private static final String FILETYPE = "SHARED";
     private static final String ACCESSPATTERN = "SEQUENTIAL";
-    private static final int TASKNUMBER = 4;
+    private static final int TASKNUMBER = 3;
     private static final int SEGMENTSNUMBER = 2;
-    private static final int STRIPECOUNT = 3;
+    private static final int STRIPECOUNT = 2;
     private static final int STRIPESIZE = 64;
     private static final int NODESAMOUNT = 4;
     private static final int BLOCKSIZE = 2048;
@@ -113,8 +111,10 @@ public class AbstractSimulator extends Model {
                 sharedNodes.add(dataNodesQueue.get(nodesIndex[i]));
             }
             for (int i = 0; i < segments.size(); i++) {
+                sharedNodes.resetNextPointer();
                 for (int j = 0; j < TASKNUMBER; j++) {
                     DataNode actualNode = sharedNodes.next();
+                    System.out.println("node: " + actualNode);
                     Task newTask = new Task(this, actualNode,
                             segments.get(i), requestsPerBlock, REQUESTSIZE, STRIPESIZE);
                     newTask.execute();
