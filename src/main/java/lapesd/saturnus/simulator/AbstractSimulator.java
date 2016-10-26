@@ -2,6 +2,7 @@ package lapesd.saturnus.simulator;
 
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
+import lapesd.saturnus.data.Block;
 import lapesd.saturnus.data.DataNode;
 import lapesd.saturnus.data.Segment;
 import lapesd.saturnus.dataStructures.CircularList;
@@ -14,24 +15,16 @@ import lapesd.saturnus.math.MathFunctions;
  */
 public class AbstractSimulator extends Model {
 
-    /*
-        OBS: Se tratando de enviar Sub Req. para os nodos, como fazer a 'simetria'
-    entre segmentos? Cada nodo terá de executar as mesmas Sub Reqisisções?
-     */
-
-
-
     private static final String FILETYPE = "SHARED";
     private static final String ACCESSPATTERN = "SEQUENTIAL";
     private static final int TASKNUMBER = 3;
     private static final int SEGMENTSNUMBER = 2;
     private static final int STRIPECOUNT = 2;
-    private static final int STRIPESIZE = 64;
-    private static final int NODESAMOUNT = 4;
+    private static final int STRIPESIZE = 512;
+    private static final int NODESAMOUNT = 10;
     private static final int BLOCKSIZE = 2048;
-    private static final int REQUESTSIZE = 1024;
+    private static final int REQUESTSIZE = 512;
 
-    private int requestsPerBlock;
     protected Queue<DataNode> dataNodesQueue;
     protected Queue<Segment> segments;
 
@@ -41,11 +34,10 @@ public class AbstractSimulator extends Model {
 
     /**
      * Initialize all the queues, nodes and distributions used through the
-     * simulator. All the inicial settings are made here.
+     * simulator. All the initial settings are made here.
      */
     @Override
     public void init() {
-        this.requestsPerBlock = MathFunctions.ceilInt((double)BLOCKSIZE/(double)REQUESTSIZE);
         this.dataNodesQueue = new Queue<DataNode>(this, "Data nodes", true, true);
         this.segments = new Queue<Segment>(this, "Segments", true, true);
 
@@ -95,12 +87,15 @@ public class AbstractSimulator extends Model {
      * a different action.
      */
     private void scheduleTasks() {
+        int blockID = 0;
         if (FILETYPE == "FPP" && ACCESSPATTERN == "SEQUENTIAL") {
             int randomNode = MathFunctions.randomInt(NODESAMOUNT);
             for (int i = 0; i < segments.size(); i++) {
+                Segment actualSeg = segments.get(i);
                 for (int j = 0; j < TASKNUMBER; j++) {
+                    Block block = new Block(this, actualSeg, BLOCKSIZE, blockID++);
                     Task newTask = new Task(this, dataNodesQueue.get(randomNode),
-                            segments.get(i), requestsPerBlock, REQUESTSIZE, STRIPESIZE);
+                            block, REQUESTSIZE, STRIPESIZE);
                     newTask.execute();
                 }
             }
@@ -111,12 +106,13 @@ public class AbstractSimulator extends Model {
                 sharedNodes.add(dataNodesQueue.get(nodesIndex[i]));
             }
             for (int i = 0; i < segments.size(); i++) {
+                Segment actualSeg = segments.get(i);
                 sharedNodes.resetNextPointer();
                 for (int j = 0; j < TASKNUMBER; j++) {
                     DataNode actualNode = sharedNodes.next();
-                    System.out.println("node: " + actualNode);
+                    Block block = new Block(this, actualSeg, BLOCKSIZE, blockID++);
                     Task newTask = new Task(this, actualNode,
-                            segments.get(i), requestsPerBlock, REQUESTSIZE, STRIPESIZE);
+                            block, REQUESTSIZE, STRIPESIZE);
                     newTask.execute();
                 }
             }

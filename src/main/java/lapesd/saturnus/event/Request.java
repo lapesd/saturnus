@@ -7,20 +7,21 @@ import lapesd.saturnus.simulator.AbstractSimulator;
 
 public class Request extends Entity {
 
-    private int stripeSize, requestSize, subRequestsAmount;
+    private int stripeSize, requestSize, subRequestsAmount, offset;
     private AbstractSimulator model;
     private Task task;
     private DataNode dataNode;
 
     public Request(Model model, Task task, DataNode dataNode, int requestSize,
-                   int stripeSize) {
+                   int stripeSize, int offset) {
         super(model, "Request", true);
         this.model = (AbstractSimulator)model;
         this.task = task;
         this.dataNode = dataNode;
-        this.requestSize = requestSize;
         this.stripeSize = stripeSize;
+        this.requestSize = requestSize;
         this.subRequestsAmount = requestSize/stripeSize;
+        this.offset = offset;
     }
 
     public Task getTask() {
@@ -35,6 +36,8 @@ public class Request extends Entity {
             SubRequest newSubRequests = new SubRequest(model, this, stripeSize);
             dataNode.insertSubRequest(newSubRequests);
         }
+        sendTraceNote(task + " writing/reading from offset " + this.offset
+                        + " - " + this);
     }
 
 }

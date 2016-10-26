@@ -5,7 +5,6 @@ import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
 import lapesd.saturnus.data.Block;
 import lapesd.saturnus.data.DataNode;
-import lapesd.saturnus.data.Segment;
 import lapesd.saturnus.simulator.AbstractSimulator;
 
 public class Task extends Entity{
@@ -15,26 +14,30 @@ public class Task extends Entity{
     private int requestSize, stripeSize;
     private Queue<Request> requestQueue;
 
-    public Task(Model model, DataNode node, Segment segment, int requestsPerBlock,
-                int requestSize, int stripeSize) {
+    public Task(Model model, DataNode node, Block block, int requestSize, int stripeSize) {
         super(model, "Task", true);
         this.model = (AbstractSimulator)model;
         this.node = node;
-        this.block = new Block(model, segment);
+        this.block = block;
         this.requestSize = requestSize;
         this.stripeSize = stripeSize;
         this.requestQueue = new Queue<Request>(model, null, false, false);
-        initRequests(requestsPerBlock);
+        initRequests(block.getBlockSize() / requestSize);
+        sendTraceNote("Read/Write at " + this.block + ", "
+                + this.block.getSegment());
     }
 
     /**
      * Add 'n' requests into the request queue, where the 'n' is the
-     * number of requests per block.
+     * number of requests per block. Otherwise, calculate the offset
+     * of each request.
      * @param requestsPerBlock
      */
     private void initRequests(int requestsPerBlock) {
+        int requestOffset = block.getID() * block.getBlockSize();
         for (int i = 0; i < requestsPerBlock; i++) {
-            requestQueue.insert(new Request(model, this, node, requestSize, stripeSize));
+            requestQueue.insert(new Request(model, this, node, requestSize, stripeSize, requestOffset));
+            requestOffset += this.requestSize;
         }
     }
 

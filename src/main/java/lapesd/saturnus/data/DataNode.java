@@ -20,10 +20,10 @@ public class DataNode extends Entity {
 
     /**
      * Just add a given sub request into the queue.
-     * @param subReq
+     * @param subRequest
      */
-    public void insertSubRequest(SubRequest subReq) {
-        this.subRequestsQueue.add(subReq);
+    public void insertSubRequest(SubRequest subRequest) {
+        this.subRequestsQueue.add(subRequest);
     }
 
     /**
