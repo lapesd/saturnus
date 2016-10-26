@@ -90,8 +90,7 @@ public class AbstractSimulator extends Model {
         int blockID = 0;
         if (FILETYPE == "FPP" && ACCESSPATTERN == "SEQUENTIAL") {
             int randomNode = MathFunctions.randomInt(NODESAMOUNT);
-            for (int i = 0; i < segments.size(); i++) {
-                Segment actualSeg = segments.get(i);
+            for (Segment actualSeg : segments) {
                 for (int j = 0; j < TASKNUMBER; j++) {
                     Block block = new Block(this, actualSeg, BLOCKSIZE, blockID++);
                     Task newTask = new Task(this, dataNodesQueue.get(randomNode),
@@ -102,11 +101,10 @@ public class AbstractSimulator extends Model {
         } else if(FILETYPE == "SHARED" && ACCESSPATTERN == "SEQUENTIAL") {
             CircularList<DataNode> sharedNodes = new CircularList<DataNode>();
             int[] nodesIndex = MathFunctions.randomInt(NODESAMOUNT, STRIPECOUNT);
-            for (int i = 0; i < STRIPECOUNT; i++) {
-                sharedNodes.add(dataNodesQueue.get(nodesIndex[i]));
+            for (int i : nodesIndex) {
+                sharedNodes.add(dataNodesQueue.get(i));
             }
-            for (int i = 0; i < segments.size(); i++) {
-                Segment actualSeg = segments.get(i);
+            for (Segment actualSeg : segments) {
                 sharedNodes.resetNextPointer();
                 for (int j = 0; j < TASKNUMBER; j++) {
                     DataNode actualNode = sharedNodes.next();
