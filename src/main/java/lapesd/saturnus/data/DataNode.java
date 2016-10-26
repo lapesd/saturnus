@@ -31,17 +31,18 @@ public class DataNode extends Entity {
      * @return The removed element
      */
     private SubRequest removeFirstSubRequest() {
+        if (subRequestsQueue.size() == 0) return null;
         return this.subRequestsQueue.remove(0);
     }
 
     /**
      * Get all the sub requests of the queue and schedule them. That means,
-     * execute all the events.
+     * execute all the events. Just to simplify, the 'execution time' of each
+     * event is considered as 1 time unit.
      */
     public void execute() {
-        int queueSize = this.subRequestsQueue.size();
-        for (int i = 0; i < queueSize; i++) {
-            SubRequest toBeExecuted = removeFirstSubRequest();
+        SubRequest toBeExecuted;
+        while ((toBeExecuted=removeFirstSubRequest()) != null) {
             toBeExecuted.schedule(toBeExecuted.getRequest(), this, new TimeSpan(nodeClock));
             this.nodeClock++;
         }

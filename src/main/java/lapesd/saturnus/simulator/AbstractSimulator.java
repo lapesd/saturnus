@@ -53,7 +53,7 @@ public class AbstractSimulator extends Model {
 
     /**
      * Creates the initial schedules to the simulator and send the signal
-     * to execute them.
+     * to schedule them.
      */
     @Override
     public void doInitialSchedules() {
@@ -72,7 +72,7 @@ public class AbstractSimulator extends Model {
     }
 
     /**
-     * 'Walks' through the data nodes queue and execute all actions
+     * 'Walks' through the data nodes queue and schedule all actions
      * scheduled at each node(sub request, request, etc.)
      */
     private void executeAllNodes() {
@@ -96,7 +96,7 @@ public class AbstractSimulator extends Model {
                     Block block = new Block(this, actualSeg, BLOCKSIZE, blockID++);
                     Task newTask = new Task(this, dataNodesQueue.get(randomNode),
                             block, REQUESTSIZE, STRIPESIZE);
-                    newTask.execute();
+                    newTask.schedule();
                 }
             }
         } else if(FILETYPE == "SHARED" && ACCESSPATTERN == "SEQUENTIAL") {
@@ -113,7 +113,7 @@ public class AbstractSimulator extends Model {
                     Block block = new Block(this, actualSeg, BLOCKSIZE, blockID++);
                     Task newTask = new Task(this, actualNode,
                             block, REQUESTSIZE, STRIPESIZE);
-                    newTask.execute();
+                    newTask.schedule();
                 }
             }
 

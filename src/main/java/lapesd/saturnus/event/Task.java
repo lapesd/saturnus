@@ -43,12 +43,12 @@ public class Task extends Entity{
 
     /**
      * 'Walks' through the request queue and schedule it. That means,
-     * generate the sub requests and execute them.
+     * generate the sub requests and schedule them.
      */
-    public void execute() {
-        int queueSize = this.requestQueue.size();
-        for (int i = 0; i < queueSize; i++) {
-            removeFirstRequest().scheduleRequest();
+    public void schedule() {
+        Request removedRequest;
+        while ((removedRequest=removeFirstRequest()) != null) {
+            removedRequest.scheduleRequest();
         }
     }
 

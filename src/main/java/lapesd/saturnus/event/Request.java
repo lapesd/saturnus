@@ -29,12 +29,11 @@ public class Request extends Entity {
     }
 
     /**
-     * Creates sub requests and insert the into the request data node.
+     * Creates sub requests and inserts them into the data node.
      */
     public void scheduleRequest() {
         for (int i = 0; i < subRequestsAmount; i++) {
-            SubRequest newSubRequests = new SubRequest(model, this, stripeSize);
-            dataNode.insertSubRequest(newSubRequests);
+            dataNode.insertSubRequest(new SubRequest(model, this, stripeSize));
         }
         sendTraceNote(task + " writing/reading from offset " + this.offset
                         + " - " + this);
