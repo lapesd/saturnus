@@ -2,41 +2,36 @@ package lapesd.saturnus.event;
 
 import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
-import lapesd.saturnus.data.DataNode;
+import lapesd.saturnus.server.Client;
 import lapesd.saturnus.simulator.AbstractSimulator;
 
 public class Request extends Entity {
 
-    private int stripeSize, requestSize, subRequestsAmount, offset;
+    private int subRequestsAmount;
     private AbstractSimulator model;
-    private Task task;
-    private DataNode dataNode;
+    private Client client;
+    private SubRequest[] subRequests;
 
-    public Request(Model model, Task task, DataNode dataNode, int requestSize,
-                   int stripeSize, int offset) {
+    public Request(Model model, Client client) {
         super(model, "Request", true);
         this.model = (AbstractSimulator)model;
-        this.task = task;
-        this.dataNode = dataNode;
-        this.stripeSize = stripeSize;
-        this.requestSize = requestSize;
-        this.subRequestsAmount = requestSize/stripeSize;
-        this.offset = offset;
+        this.client = client;
+        this.subRequestsAmount = this.model.getREQUESTSIZE()/ this.model.getSTRIPESIZE();
+        this.subRequests = new SubRequest[this.subRequestsAmount];
     }
 
-    public Task getTask() {
-        return this.task;
+    public Client getClient() {
+        return this.client;
     }
 
-    /**
-     * Creates sub requests and inserts them into the data node.
-     */
-    public void scheduleRequest() {
+    public SubRequest[] getSubRequests() {
+        return this.subRequests;
+    }
+
+    public void generateSubRequests() {
         for (int i = 0; i < subRequestsAmount; i++) {
-            dataNode.insertSubRequest(new SubRequest(model, this, stripeSize));
+            subRequests[i] = new SubRequest(model, this);
         }
-        sendTraceNote(task + " writing/reading from offset " + this.offset
-                        + " - " + this);
     }
 
 }

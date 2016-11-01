@@ -3,11 +3,10 @@ package lapesd.saturnus.simulator;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
 import lapesd.saturnus.data.Block;
-import lapesd.saturnus.data.DataNode;
-import lapesd.saturnus.data.Segment;
 import lapesd.saturnus.dataStructures.CircularList;
-import lapesd.saturnus.event.Task;
 import lapesd.saturnus.math.MathFunctions;
+import lapesd.saturnus.server.Client;
+import lapesd.saturnus.server.DataNode;
 
 /**
  * The "base" of the simulator. Has all methods to handle with the events,
@@ -15,21 +14,35 @@ import lapesd.saturnus.math.MathFunctions;
  */
 public class AbstractSimulator extends Model {
 
-    private static final String FILETYPE = "SHARED";
-    private static final String ACCESSPATTERN = "SEQUENTIAL";
-    private static final int TASKNUMBER = 3;
-    private static final int SEGMENTSNUMBER = 2;
-    private static final int STRIPECOUNT = 2;
-    private static final int STRIPESIZE = 512;
-    private static final int NODESAMOUNT = 10;
-    private static final int BLOCKSIZE = 2048;
-    private static final int REQUESTSIZE = 512;
+    // Parameters
+    private final String FILETYPE = "SHARED";
+    private final String ACCESSPATTERN = "SEQUENTIAL";
+    private final int TASKNUMBER = 2;
+    private final int SEGMENTSNUMBER = 2;
+    private final int STRIPECOUNT = 2;
+    private final int STRIPESIZE = 512;
+    private final int NODESAMOUNT = 3;
+    private final int BLOCKSIZE = 2048;
+    private final int REQUESTSIZE = 1024;
 
-    protected Queue<DataNode> dataNodesQueue;
-    protected Queue<Segment> segments;
+    private CircularList<DataNode> allDataNodes;
+    private CircularList<DataNode> dataNodes;
+    private Queue<Client> clients;
 
     public AbstractSimulator() {
-        super(null, "AbstractSimulator", true, false);
+        super(null, "Abstract simulator", true, false);
+    }
+
+    public int getSTRIPESIZE() {
+        return STRIPESIZE;
+    }
+
+    public int getBLOCKSIZE() {
+        return BLOCKSIZE;
+    }
+
+    public int getREQUESTSIZE() {
+        return REQUESTSIZE;
     }
 
     /**
@@ -38,17 +51,19 @@ public class AbstractSimulator extends Model {
      */
     @Override
     public void init() {
-        this.dataNodesQueue = new Queue<DataNode>(this, "Data nodes", true, true);
-        this.segments = new Queue<Segment>(this, "Segments", true, true);
+        this.allDataNodes = new CircularList<DataNode>();
+        this.clients = new Queue<Client>(this, "Clients", true, true);
 
-        // Initialize the segments.
-        for (int i = 0; i < SEGMENTSNUMBER; i++) {
-            segments.insert(new Segment(this));
+        // Initialize the Clients.
+        for (int i = 0; i < TASKNUMBER; i++) {
+            clients.insert(new Client(this, i));
         }
         // Initialize the data nodes.
         for (int i = 0; i < NODESAMOUNT; i++) {
-            dataNodesQueue.insert(new DataNode(this));
+            allDataNodes.add(new DataNode(this, i));
         }
+
+        randomDataNodes(NODESAMOUNT, STRIPECOUNT);
     }
 
     /**
@@ -77,7 +92,16 @@ public class AbstractSimulator extends Model {
      */
     private void executeAllNodes() {
         for (int i = 0; i < NODESAMOUNT; i++) {
-            this.dataNodesQueue.get(i).execute();
+            this.dataNodes.get(i).execute();
+        }
+    }
+
+    private void randomDataNodes(int nodesAmount, int stripeCount) {
+        // Generate a circular list with 'STRIPECOUNT' data nodes
+        this.dataNodes = new CircularList<DataNode>();
+        int[] nodesIndex = MathFunctions.randomInt(nodesAmount, stripeCount);
+        for (int index : nodesIndex) {
+            this.dataNodes.add(allDataNodes.get(index));
         }
     }
 
@@ -87,34 +111,24 @@ public class AbstractSimulator extends Model {
      * a different action.
      */
     private void scheduleTasks() {
-        int blockID = 0;
         if (FILETYPE == "FPP" && ACCESSPATTERN == "SEQUENTIAL") {
-            int randomNode = MathFunctions.randomInt(NODESAMOUNT);
-            for (Segment actualSeg : segments) {
+            Client actualClient = clients.get(MathFunctions.randomInt(TASKNUMBER));
+            // Mantém sincronia entre os segmentos.
+            for (int i = 0; i < SEGMENTSNUMBER; i++) {
                 for (int j = 0; j < TASKNUMBER; j++) {
-                    Block block = new Block(this, actualSeg, BLOCKSIZE, blockID++);
-                    Task newTask = new Task(this, dataNodesQueue.get(randomNode),
-                            block, REQUESTSIZE, STRIPESIZE);
-                    newTask.schedule();
+                    Block block = new Block(this, actualClient, i);
+                    actualClient.writeBlock(block, this.dataNodes);
                 }
             }
         } else if(FILETYPE == "SHARED" && ACCESSPATTERN == "SEQUENTIAL") {
-            CircularList<DataNode> sharedNodes = new CircularList<DataNode>();
-            int[] nodesIndex = MathFunctions.randomInt(NODESAMOUNT, STRIPECOUNT);
-            for (int i : nodesIndex) {
-                sharedNodes.add(dataNodesQueue.get(i));
-            }
-            for (Segment actualSeg : segments) {
-                sharedNodes.resetNextPointer();
-                for (int j = 0; j < TASKNUMBER; j++) {
-                    DataNode actualNode = sharedNodes.next();
-                    Block block = new Block(this, actualSeg, BLOCKSIZE, blockID++);
-                    Task newTask = new Task(this, actualNode,
-                            block, REQUESTSIZE, STRIPESIZE);
-                    newTask.schedule();
+            // Mantém sincronia entre os segmentos.
+            for (int i = 0; i < SEGMENTSNUMBER; i++) {
+                for (Client actualClient : clients) {
+                    Block block = new Block(this, actualClient, i);
+                    actualClient.writeBlock(block, this.dataNodes);
                 }
             }
-
         }
+
     }
 }

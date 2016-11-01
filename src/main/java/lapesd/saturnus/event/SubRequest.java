@@ -2,16 +2,14 @@ package lapesd.saturnus.event;
 
 import desmoj.core.simulator.EventOf2Entities;
 import desmoj.core.simulator.Model;
-import lapesd.saturnus.data.DataNode;
+import lapesd.saturnus.server.DataNode;
 
 public class SubRequest extends EventOf2Entities<Request, DataNode> {
 
     private Request request;
-    private int stripeSize;
 
-    public SubRequest(Model model, Request request, int stripeSize) {
+    public SubRequest(Model model, Request request) {
         super(model, "Sub request.", true);
-        this.stripeSize = stripeSize;
         this.request = request;
     }
 
@@ -29,6 +27,7 @@ public class SubRequest extends EventOf2Entities<Request, DataNode> {
     public void eventRoutine(Request request, DataNode dataNode) {
         // Execute the write()/read()
         sendTraceNote("Sub request executed - " + getRequest()
-                        + ", " + getRequest().getTask());
+                + ", Client " + request.getClient().getID()
+                + " , " + dataNode);
     }
 }
