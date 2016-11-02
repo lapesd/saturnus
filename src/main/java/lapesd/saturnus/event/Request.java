@@ -7,21 +7,28 @@ import lapesd.saturnus.simulator.AbstractSimulator;
 
 public class Request extends Entity {
 
-    private int subRequestsAmount;
+    private int subRequestsAmount, offset;
     private AbstractSimulator model;
     private Client client;
     private SubRequest[] subRequests;
 
-    public Request(Model model, Client client) {
+    public Request(Model model, Client client, int offset) {
         super(model, "Request", true);
         this.model = (AbstractSimulator)model;
         this.client = client;
         this.subRequestsAmount = this.model.getREQUESTSIZE()/ this.model.getSTRIPESIZE();
+        this.offset = offset;
         this.subRequests = new SubRequest[this.subRequestsAmount];
+        sendTraceNote("Write/read from offset " + offset
+                + " - Client " + client.getID());
     }
 
     public Client getClient() {
         return this.client;
+    }
+
+    public int getOffset() {
+        return this.offset;
     }
 
     public SubRequest[] getSubRequests() {

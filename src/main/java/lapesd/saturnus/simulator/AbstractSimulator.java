@@ -112,20 +112,24 @@ public class AbstractSimulator extends Model {
      */
     private void scheduleTasks() {
         if (FILETYPE == "FPP" && ACCESSPATTERN == "SEQUENTIAL") {
+            int blockID = 0;
             Client actualClient = clients.get(MathFunctions.randomInt(TASKNUMBER));
             // Mantém sincronia entre os segmentos.
             for (int i = 0; i < SEGMENTSNUMBER; i++) {
                 for (int j = 0; j < TASKNUMBER; j++) {
-                    Block block = new Block(this, actualClient, i);
+                    Block block = new Block(this, actualClient, i, blockID);
                     actualClient.writeBlock(block, this.dataNodes);
+                    blockID++;
                 }
             }
         } else if(FILETYPE == "SHARED" && ACCESSPATTERN == "SEQUENTIAL") {
+            int blockID = 0;
             // Mantém sincronia entre os segmentos.
             for (int i = 0; i < SEGMENTSNUMBER; i++) {
                 for (Client actualClient : clients) {
-                    Block block = new Block(this, actualClient, i);
+                    Block block = new Block(this, actualClient, i, blockID);
                     actualClient.writeBlock(block, this.dataNodes);
+                    blockID++;
                 }
             }
         }

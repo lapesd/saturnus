@@ -26,7 +26,7 @@ public class Client extends Entity {
 
     // Write just one block
     public void writeBlock(Block block, CircularList dataNodes) {
-        block.generateRequests();
+        block.generateRequests(block.getBlockID() * model.getBLOCKSIZE());
         Queue<Request> requests = block.getRequests();
         for (Request actualRequest : requests) {
             actualRequest.generateSubRequests();
