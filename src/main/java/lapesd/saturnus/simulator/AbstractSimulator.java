@@ -20,10 +20,10 @@ public class AbstractSimulator extends Model {
     private final int TASKNUMBER = 2;
     private final int SEGMENTSNUMBER = 2;
     private final int STRIPECOUNT = 2;
-    private final int STRIPESIZE = 512;
+    private final int STRIPESIZE = 1000;
     private final int NODESAMOUNT = 3;
-    private final int BLOCKSIZE = 2048;
-    private final int REQUESTSIZE = 1024;
+    private final int BLOCKSIZE = 6000;
+    private final int REQUESTSIZE = 3000;
 
     private CircularList<DataNode> allDataNodes;
     private CircularList<DataNode> dataNodes;

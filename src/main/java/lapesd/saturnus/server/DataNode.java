@@ -20,16 +20,8 @@ public class DataNode extends Entity {
         this.subRequestsQueue = new Vector<SubRequest>();
     }
 
-    /**
-     * Just add a given sub request into the queue.
-     * @param subRequest
-     */
-    public void insertSubRequest(SubRequest subRequest) {
-        this.subRequestsQueue.add(subRequest);
-    }
-
-    public void incrementNodeClock(double time) {
-        this.nodeClock += time;
+    public double getNodeClock() {
+        return this.nodeClock;
     }
 
     /**
@@ -40,9 +32,24 @@ public class DataNode extends Entity {
     public void execute() {
         SubRequest toBeExecuted;
         while ((toBeExecuted=removeFirstSubRequest()) != null) {
-            toBeExecuted.schedule(toBeExecuted.getRequest(), this, new TimeSpan(nodeClock));
-            incrementNodeClock(1);
+            toBeExecuted.schedule(toBeExecuted.getRequest(), this, toBeExecuted.getScheduleTime());
         }
+    }
+
+    /**
+     * Add a given sub request into the queue. Beyond that, check if
+     * the sub request needs to be scheduled at some specific time span
+     * (usually because of a sync between requests).
+     * @param subRequest Sub request to insert
+     */
+    public void insertSubRequest(SubRequest subRequest) {
+        TimeSpan scheduleTime = subRequest.getScheduleTime();
+        if (scheduleTime == null || scheduleTime.getTimeAsDouble() < this.nodeClock)
+            subRequest.setScheduleTime(new TimeSpan(this.nodeClock));
+        else
+            this.nodeClock = scheduleTime.getTimeAsDouble();
+        incrementNodeClock(subRequest.getExecutionTime());
+        this.subRequestsQueue.add(subRequest);
     }
 
     /**
@@ -52,5 +59,9 @@ public class DataNode extends Entity {
     private SubRequest removeFirstSubRequest() {
         if (subRequestsQueue.size() == 0) return null;
         return this.subRequestsQueue.remove(0);
+    }
+
+    private void incrementNodeClock(double time) {
+        this.nodeClock += time;
     }
 }

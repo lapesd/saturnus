@@ -24,20 +24,37 @@ public class Client extends Entity {
         return this.ID;
     }
 
-    // Write just one block
+    /**
+     * Receives a block to 'write' into the data servers. Beyond that,
+     * synchronize the schedule time between requests of the same block.
+     * @param block Block to be scheduled into data servers
+     * @param dataNodes The data nodes or data servers
+     */
     public void writeBlock(Block block, CircularList dataNodes) {
         block.generateRequests(block.getBlockID() * model.getBLOCKSIZE());
         Queue<Request> requests = block.getRequests();
+        int nextRequestStart = 0;
         for (Request actualRequest : requests) {
             actualRequest.generateSubRequests();
+            actualRequest.sync(nextRequestStart);
             sendSubRequests(dataNodes, actualRequest);
+            nextRequestStart = actualRequest.getOutputTime();
         }
     }
 
-    // Send sub requests of one request to the data nodes(round-robin)
+    /**
+     * Receives a request, where gets the sub requests and insert them into
+     * the given data nodes(round-robin).
+     * @param dataNodesList Data nodes that will process the request
+     * @param request Request to be processed
+     */
     public void sendSubRequests(CircularList<DataNode> dataNodesList, Request request) {
         for (SubRequest subRequest : request.getSubRequests()) {
-            dataNodesList.next().insertSubRequest(subRequest);
+            DataNode nodeToSchedule = dataNodesList.next();
+            nodeToSchedule.insertSubRequest(subRequest);
+            if (nodeToSchedule.getNodeClock() > request.getOutputTime()) {
+                request.setOutputTime((int)nodeToSchedule.getNodeClock());
+            }
         }
     }
 }

@@ -2,19 +2,35 @@ package lapesd.saturnus.event;
 
 import desmoj.core.simulator.EventOf2Entities;
 import desmoj.core.simulator.Model;
+import desmoj.core.simulator.TimeSpan;
 import lapesd.saturnus.server.DataNode;
 
 public class SubRequest extends EventOf2Entities<Request, DataNode> {
 
     private Request request;
+    private int executionTime;
+    private TimeSpan scheduleTime;
 
-    public SubRequest(Model model, Request request) {
+    public SubRequest(Model model, Request request, int executionTime) {
         super(model, "Sub request.", true);
         this.request = request;
+        this.executionTime = executionTime;
     }
 
     public Request getRequest() {
         return this.request;
+    }
+
+    public int getExecutionTime() {
+        return this.executionTime;
+    }
+
+    public TimeSpan getScheduleTime() {
+        return this.scheduleTime;
+    }
+
+    public void setScheduleTime(TimeSpan time) {
+        this.scheduleTime = time;
     }
 
     /**
