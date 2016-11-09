@@ -21,7 +21,7 @@ public class Request extends Entity {
         this.offset = offset;
         this.subRequests = new SubRequest[this.subRequestsAmount];
         this.outputTime = 0;
-        sendTraceNote("Write/read from offset " + offset
+        sendTraceNote("Write/read from offset " + getOffset()
                 + " - Client " + client.getID());
     }
 
@@ -63,7 +63,7 @@ public class Request extends Entity {
     public void sync(int timeToStartSubReq) {
         if (timeToStartSubReq != 0) {
             for (SubRequest subRequest : subRequests)
-                subRequest.setScheduleTime(new TimeSpan(timeToStartSubReq));
+                subRequest.setInitialScheduleTime(new TimeSpan(timeToStartSubReq));
         }
     }
 

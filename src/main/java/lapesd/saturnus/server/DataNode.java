@@ -20,6 +20,10 @@ public class DataNode extends Entity {
         this.subRequestsQueue = new Vector<SubRequest>();
     }
 
+    public int getID() {
+        return this.ID;
+    }
+
     public double getNodeClock() {
         return this.nodeClock;
     }
@@ -32,7 +36,8 @@ public class DataNode extends Entity {
     public void execute() {
         SubRequest toBeExecuted;
         while ((toBeExecuted=removeFirstSubRequest()) != null) {
-            toBeExecuted.schedule(toBeExecuted.getRequest(), this, toBeExecuted.getScheduleTime());
+            toBeExecuted.schedule(toBeExecuted.getRequest(), this, toBeExecuted.getClient(),
+                                  toBeExecuted.getInitialScheduleTime());
         }
     }
 
@@ -43,11 +48,11 @@ public class DataNode extends Entity {
      * @param subRequest Sub request to insert
      */
     public void insertSubRequest(SubRequest subRequest) {
-        TimeSpan scheduleTime = subRequest.getScheduleTime();
-        if (scheduleTime == null || scheduleTime.getTimeAsDouble() < this.nodeClock)
-            subRequest.setScheduleTime(new TimeSpan(this.nodeClock));
+        TimeSpan initialScheduleTime = subRequest.getInitialScheduleTime();
+        if (initialScheduleTime == null || initialScheduleTime.getTimeAsDouble() < this.nodeClock)
+            subRequest.setInitialScheduleTime(new TimeSpan(this.nodeClock));
         else
-            this.nodeClock = scheduleTime.getTimeAsDouble();
+            this.nodeClock = initialScheduleTime.getTimeAsDouble();
         incrementNodeClock(subRequest.getExecutionTime());
         this.subRequestsQueue.add(subRequest);
     }

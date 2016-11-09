@@ -17,13 +17,13 @@ public class AbstractSimulator extends Model {
     // Parameters
     private final String FILETYPE = "SHARED";
     private final String ACCESSPATTERN = "SEQUENTIAL";
-    private final int TASKNUMBER = 2;
-    private final int SEGMENTSNUMBER = 2;
-    private final int STRIPECOUNT = 2;
-    private final int STRIPESIZE = 1000;
+    private final int TASKNUMBER = 4;
+    private final int SEGMENTSNUMBER = 20;
+    private final int STRIPECOUNT = 3;
+    private final int STRIPESIZE = 512;
     private final int NODESAMOUNT = 3;
-    private final int BLOCKSIZE = 6000;
-    private final int REQUESTSIZE = 3000;
+    private final int BLOCKSIZE = 2048;
+    private final int REQUESTSIZE = 1024;
 
     private CircularList<DataNode> allDataNodes;
     private CircularList<DataNode> dataNodes;
@@ -59,11 +59,12 @@ public class AbstractSimulator extends Model {
             clients.insert(new Client(this, i));
         }
         // Initialize the data nodes.
+        // Not used. Just to formalization.
         for (int i = 0; i < NODESAMOUNT; i++) {
             allDataNodes.add(new DataNode(this, i));
         }
-
-        randomDataNodes(NODESAMOUNT, STRIPECOUNT);
+        // Select just 'STRIPECOUNT' data servers.
+        this.dataNodes = randomDataNodes(NODESAMOUNT, STRIPECOUNT);
     }
 
     /**
@@ -96,13 +97,20 @@ public class AbstractSimulator extends Model {
         }
     }
 
-    private void randomDataNodes(int nodesAmount, int stripeCount) {
+    /**
+     * Generates a circular list with "stripeCount" data nodes, without
+     * repetition.
+     * @param nodesAmount Total nodes amount
+     * @param stripeCount Number of nodes to be selected
+     * @return A circular list with 'stripeCount' data nodes
+     */
+    private CircularList randomDataNodes(int nodesAmount, int stripeCount) {
         // Generate a circular list with 'STRIPECOUNT' data nodes
-        this.dataNodes = new CircularList<DataNode>();
+        CircularList<DataNode> dataNodes = new CircularList<DataNode>();
         int[] nodesIndex = MathFunctions.randomInt(nodesAmount, stripeCount);
-        for (int index : nodesIndex) {
-            this.dataNodes.add(allDataNodes.get(index));
-        }
+        for (int index : nodesIndex)
+            dataNodes.add(allDataNodes.get(index));
+        return dataNodes;
     }
 
     /**
@@ -111,6 +119,7 @@ public class AbstractSimulator extends Model {
      * a different action.
      */
     private void scheduleTasks() {
+        CSVformat csvfile = new CSVformat();
         if (FILETYPE == "FPP" && ACCESSPATTERN == "SEQUENTIAL") {
             int blockID = 0;
             Client actualClient = clients.get(MathFunctions.randomInt(TASKNUMBER));

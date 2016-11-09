@@ -3,6 +3,7 @@ import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeInstant;
 import desmoj.extensions.xml.report.XMLTraceOutput;
 import lapesd.saturnus.simulator.AbstractSimulator;
+import lapesd.saturnus.simulator.CSVformat;
 
 public class SimulationRunner {
 
@@ -10,6 +11,9 @@ public class SimulationRunner {
         Model model = new AbstractSimulator();
         Experiment exp = new Experiment("Simulation");
         XMLTraceOutput xmlTrace = new XMLTraceOutput();
+
+        // Initialize the CSV output buffer.
+        CSVformat.openFileToWrite("trace.csv", "request_offset, datanode, client_id, scheduled_time");
 
         // Connect both model and experiment.
         model.connectToExperiment(exp);
@@ -22,7 +26,10 @@ public class SimulationRunner {
         exp.start();
 
         exp.report();
+
         xmlTrace.close();
+        CSVformat.closeFile();
+
         exp.finish();
 
     }

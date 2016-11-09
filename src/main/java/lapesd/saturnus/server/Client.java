@@ -13,11 +13,13 @@ public class Client extends Entity {
 
     private AbstractSimulator model;
     private int ID;
+    private int lastRequestOutputTime;
 
     public Client(Model model, int clientID) {
         super(model, "Client", true);
         this.model = (AbstractSimulator)model;
         this.ID = clientID;
+        this.lastRequestOutputTime = 0;
     }
 
     public int getID() {
@@ -26,19 +28,19 @@ public class Client extends Entity {
 
     /**
      * Receives a block to 'write' into the data servers. Beyond that,
-     * synchronize the schedule time between requests of the same block.
+     * synchronize the schedule time of sub requests between requests
+     * of the same block.
      * @param block Block to be scheduled into data servers
      * @param dataNodes The data nodes or data servers
      */
     public void writeBlock(Block block, CircularList dataNodes) {
         block.generateRequests(block.getBlockID() * model.getBLOCKSIZE());
         Queue<Request> requests = block.getRequests();
-        int nextRequestStart = 0;
         for (Request actualRequest : requests) {
             actualRequest.generateSubRequests();
-            actualRequest.sync(nextRequestStart);
+            actualRequest.sync(lastRequestOutputTime);
             sendSubRequests(dataNodes, actualRequest);
-            nextRequestStart = actualRequest.getOutputTime();
+            lastRequestOutputTime = actualRequest.getOutputTime();
         }
     }
 
