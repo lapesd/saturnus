@@ -53,8 +53,8 @@ public class Client extends Entity {
     public void sendSubRequests(CircularList<DataNode> dataNodesList, Request request) {
         for (SubRequest subRequest : request.getSubRequests()) {
             DataNode nodeToSchedule = dataNodesList.next();
-            nodeToSchedule.insertSubRequest(subRequest);
-            if (nodeToSchedule.getNodeClock() > request.getOutputTime()) {
+            double nodeClock = nodeToSchedule.insertSubRequest(subRequest);
+            if (nodeClock > request.getOutputTime()) {
                 request.setOutputTime((int)nodeToSchedule.getNodeClock());
             }
         }

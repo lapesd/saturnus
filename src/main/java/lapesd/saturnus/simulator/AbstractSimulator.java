@@ -17,13 +17,13 @@ public class AbstractSimulator extends Model {
     // Parameters
     private final String FILETYPE = "SHARED";
     private final String ACCESSPATTERN = "SEQUENTIAL";
-    private final int TASKNUMBER = 4;
-    private final int SEGMENTSNUMBER = 20;
-    private final int STRIPECOUNT = 3;
-    private final int STRIPESIZE = 512;
+    private final int TASKNUMBER = 3;
+    private final int SEGMENTSNUMBER = 2;
+    private final int STRIPECOUNT = 2;
+    private final int STRIPESIZE = 1;
     private final int NODESAMOUNT = 3;
-    private final int BLOCKSIZE = 2048;
-    private final int REQUESTSIZE = 1024;
+    private final int BLOCKSIZE = 6;
+    private final int REQUESTSIZE = 3;
 
     private CircularList<DataNode> allDataNodes;
     private CircularList<DataNode> dataNodes;

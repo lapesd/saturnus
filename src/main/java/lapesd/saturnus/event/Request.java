@@ -61,10 +61,10 @@ public class Request extends Entity {
      * @param timeToStartSubReq Time that the sub requests should start
      */
     public void sync(int timeToStartSubReq) {
-        if (timeToStartSubReq != 0) {
-            for (SubRequest subRequest : subRequests)
-                subRequest.setInitialScheduleTime(new TimeSpan(timeToStartSubReq));
+        for (SubRequest subRequest : subRequests) {
+            subRequest.setSendingTime(new TimeSpan(timeToStartSubReq));
         }
     }
+
 
 }

@@ -12,7 +12,7 @@ public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
     private Request request;
     private Client client;
     private int executionTime;
-    private TimeSpan initialScheduleTime, outputTime;
+    private TimeSpan sendingTime, attendedTime, outputTime;
 
     public SubRequest(Model model, Request request, int executionTime) {
         super(model, "Sub request.", true);
@@ -33,12 +33,28 @@ public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
         return this.executionTime;
     }
 
-    public TimeSpan getInitialScheduleTime() {
-        return this.initialScheduleTime;
+    public TimeSpan getSendingTime() {
+        return this.sendingTime;
     }
 
-    public void setInitialScheduleTime(TimeSpan time) {
-        this.initialScheduleTime = time;
+    public TimeSpan getOutputTime() {
+        return this.outputTime;
+    }
+
+    public TimeSpan getAttendedTime() {
+        return this.attendedTime;
+    }
+
+    public void setSendingTime(TimeSpan sendingTime) {
+        this.sendingTime = sendingTime;
+    }
+
+    public void setOutputTime(TimeSpan outputTime) {
+        this.outputTime = outputTime;
+    }
+
+    public void setAttendedTime(TimeSpan attendedTime) {
+        this.attendedTime = attendedTime;
     }
 
     /**
@@ -56,6 +72,8 @@ public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
 
         CSVformat.writeLine(request.getOffset() + ", " + dataNode.getID()
                             + ", " + client.getID()
-                            + ", " + getInitialScheduleTime());
+                            + ", " + this.sendingTime.getTimeAsDouble()
+                            + ", " + this.attendedTime.getTimeAsDouble()
+                            + ", " + this.outputTime.getTimeAsDouble());
     }
 }

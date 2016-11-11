@@ -3,21 +3,22 @@ package lapesd.saturnus.server;
 import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeSpan;
+import lapesd.saturnus.dataStructures.SubReqComparator;
 import lapesd.saturnus.event.SubRequest;
 
-import java.util.Vector;
+import java.util.PriorityQueue;
 
 public class DataNode extends Entity {
 
     private double nodeClock;
     private int ID;
-    private Vector<SubRequest> subRequestsQueue;
+    private PriorityQueue<SubRequest> subRequestsQueue;
 
     public DataNode(Model model, int dataNodeID) {
         super(model, "DataNode", true);
         this.nodeClock = 0.0;
         this.ID = dataNodeID;
-        this.subRequestsQueue = new Vector<SubRequest>();
+        this.subRequestsQueue = new PriorityQueue<>(new SubReqComparator());
     }
 
     public int getID() {
@@ -34,10 +35,16 @@ public class DataNode extends Entity {
      * event is considered as 1 time unit(incremented into the sub request).
      */
     public void execute() {
+        this.nodeClock = 0.0;
         SubRequest toBeExecuted;
         while ((toBeExecuted=removeFirstSubRequest()) != null) {
+            TimeSpan attendedTime = new TimeSpan(nodeClock);
+            TimeSpan outputTime = new TimeSpan(nodeClock + toBeExecuted.getExecutionTime());
+            toBeExecuted.setAttendedTime(attendedTime);
+            toBeExecuted.setOutputTime(outputTime);
             toBeExecuted.schedule(toBeExecuted.getRequest(), this, toBeExecuted.getClient(),
-                                  toBeExecuted.getInitialScheduleTime());
+                    attendedTime);
+            incrementNodeClock(toBeExecuted.getExecutionTime());
         }
     }
 
@@ -47,14 +54,11 @@ public class DataNode extends Entity {
      * (usually because of a sync between requests).
      * @param subRequest Sub request to insert
      */
-    public void insertSubRequest(SubRequest subRequest) {
-        TimeSpan initialScheduleTime = subRequest.getInitialScheduleTime();
-        if (initialScheduleTime == null || initialScheduleTime.getTimeAsDouble() < this.nodeClock)
-            subRequest.setInitialScheduleTime(new TimeSpan(this.nodeClock));
-        else
-            this.nodeClock = initialScheduleTime.getTimeAsDouble();
-        incrementNodeClock(subRequest.getExecutionTime());
+    public double insertSubRequest(SubRequest subRequest) {
+        // TODO: Problem here! Sync among the clients.
+        nodeClock += subRequest.getExecutionTime();
         this.subRequestsQueue.add(subRequest);
+        return nodeClock;
     }
 
     /**
@@ -62,8 +66,7 @@ public class DataNode extends Entity {
      * @return The removed element
      */
     private SubRequest removeFirstSubRequest() {
-        if (subRequestsQueue.size() == 0) return null;
-        return this.subRequestsQueue.remove(0);
+        return this.subRequestsQueue.poll();
     }
 
     private void incrementNodeClock(double time) {
