@@ -13,7 +13,8 @@ public class SimulationRunner {
         XMLTraceOutput xmlTrace = new XMLTraceOutput();
 
         // Initialize the CSV output buffer.
-        CSVformat.openFileToWrite("trace.csv", "request_offset, datanode, client_id, scheduled_time");
+        String head = "request_offset, datanode, client_id, sending_time, attended_time, output_time";
+        CSVformat.openFileToWrite("trace.csv", head);
 
         // Connect both model and experiment.
         model.connectToExperiment(exp);

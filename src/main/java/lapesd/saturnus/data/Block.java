@@ -8,18 +8,17 @@ import lapesd.saturnus.server.Client;
 import lapesd.saturnus.simulator.AbstractSimulator;
 
 public class Block extends Entity {
-    private int segment, blockID;
+    private int blockID;
     private Client client;
     private Queue<Request> requests;
     private AbstractSimulator model;
 
-    public Block(Model model, Client client, int segment, int blockID) {
+    public Block(Model model, Client client, int blockID) {
         super(model, "Block", true);
         this.model = (AbstractSimulator)model;
         this.client = client;
-        this.segment = segment;
         this.blockID = blockID;
-        this.requests = new Queue<Request>(model, "Requests", false, false);
+        this.requests = new Queue<>(model, "Requests", false, false);
     }
 
     public int getBlockID() { return this.blockID; }

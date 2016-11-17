@@ -17,13 +17,13 @@ public class AbstractSimulator extends Model {
     // Parameters
     private final String FILETYPE = "SHARED";
     private final String ACCESSPATTERN = "SEQUENTIAL";
-    private final int TASKNUMBER = 3;
-    private final int SEGMENTSNUMBER = 2;
-    private final int STRIPECOUNT = 2;
-    private final int STRIPESIZE = 1;
-    private final int NODESAMOUNT = 3;
-    private final int BLOCKSIZE = 6;
-    private final int REQUESTSIZE = 3;
+    private final int TASKNUMBER = 2;
+    private final int SEGMENTSNUMBER = 5;
+    private final int STRIPECOUNT = 5;
+    private final int STRIPESIZE = 512;
+    private final int NODESAMOUNT = 9;
+    private final int BLOCKSIZE = 2048;
+    private final int REQUESTSIZE = 1024;
 
     private CircularList<DataNode> allDataNodes;
     private CircularList<DataNode> dataNodes;
@@ -51,8 +51,8 @@ public class AbstractSimulator extends Model {
      */
     @Override
     public void init() {
-        this.allDataNodes = new CircularList<DataNode>();
-        this.clients = new Queue<Client>(this, "Clients", true, true);
+        this.allDataNodes = new CircularList<>();
+        this.clients = new Queue<>(this, "Clients", true, true);
 
         // Initialize the Clients.
         for (int i = 0; i < TASKNUMBER; i++) {
@@ -92,9 +92,8 @@ public class AbstractSimulator extends Model {
      * scheduled at each node(sub request, request, etc.)
      */
     private void executeAllNodes() {
-        for (int i = 0; i < NODESAMOUNT; i++) {
-            this.dataNodes.get(i).execute();
-        }
+        for (DataNode auxiliar : dataNodes)
+            auxiliar.execute();
     }
 
     /**
@@ -126,7 +125,7 @@ public class AbstractSimulator extends Model {
             // Mantém sincronia entre os segmentos.
             for (int i = 0; i < SEGMENTSNUMBER; i++) {
                 for (int j = 0; j < TASKNUMBER; j++) {
-                    Block block = new Block(this, actualClient, i, blockID);
+                    Block block = new Block(this, actualClient, blockID);
                     actualClient.writeBlock(block, this.dataNodes);
                     blockID++;
                 }
@@ -136,7 +135,7 @@ public class AbstractSimulator extends Model {
             // Mantém sincronia entre os segmentos.
             for (int i = 0; i < SEGMENTSNUMBER; i++) {
                 for (Client actualClient : clients) {
-                    Block block = new Block(this, actualClient, i, blockID);
+                    Block block = new Block(this, actualClient, blockID);
                     actualClient.writeBlock(block, this.dataNodes);
                     blockID++;
                 }

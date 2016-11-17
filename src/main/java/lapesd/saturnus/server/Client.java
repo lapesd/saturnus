@@ -13,13 +13,13 @@ public class Client extends Entity {
 
     private AbstractSimulator model;
     private int ID;
-    private int lastRequestOutputTime;
+    private double lastRequestOutputTime;
 
     public Client(Model model, int clientID) {
         super(model, "Client", true);
         this.model = (AbstractSimulator)model;
         this.ID = clientID;
-        this.lastRequestOutputTime = 0;
+        this.lastRequestOutputTime = 0.0;
     }
 
     public int getID() {
@@ -54,9 +54,8 @@ public class Client extends Entity {
         for (SubRequest subRequest : request.getSubRequests()) {
             DataNode nodeToSchedule = dataNodesList.next();
             double nodeClock = nodeToSchedule.insertSubRequest(subRequest);
-            if (nodeClock > request.getOutputTime()) {
-                request.setOutputTime((int)nodeToSchedule.getNodeClock());
-            }
+            if (nodeClock > request.getOutputTime())
+                request.setOutputTime(nodeToSchedule.getNodeClock());
         }
     }
 }

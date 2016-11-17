@@ -11,10 +11,10 @@ public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
 
     private Request request;
     private Client client;
-    private int executionTime;
+    private double executionTime;
     private TimeSpan sendingTime, attendedTime, outputTime;
 
-    public SubRequest(Model model, Request request, int executionTime) {
+    public SubRequest(Model model, Request request, double executionTime) {
         super(model, "Sub request.", true);
         this.request = request;
         this.executionTime = executionTime;
@@ -29,7 +29,7 @@ public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
         return this.client;
     }
 
-    public int getExecutionTime() {
+    public double getExecutionTime() {
         return this.executionTime;
     }
 
@@ -68,7 +68,8 @@ public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
         // Execute the write()/read()
         sendTraceNote("Sub request executed - " + request
                 + ", Client " + client.getID()
-                + " , " + dataNode);
+                + " , DataNode " + dataNode.getID()
+                + " , Sent time " + getSendingTime());
 
         CSVformat.writeLine(request.getOffset() + ", " + dataNode.getID()
                             + ", " + client.getID()

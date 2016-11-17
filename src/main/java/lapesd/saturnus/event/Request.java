@@ -1,5 +1,6 @@
 package lapesd.saturnus.event;
 
+import desmoj.core.dist.ContDistNormal;
 import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeSpan;
@@ -8,10 +9,12 @@ import lapesd.saturnus.simulator.AbstractSimulator;
 
 public class Request extends Entity {
 
-    private int subRequestsAmount, offset, outputTime;
+    private int subRequestsAmount, offset;
+    private double outputTime;
     private AbstractSimulator model;
     private Client client;
     private SubRequest[] subRequests;
+    private ContDistNormal subReqExecTime;
 
     public Request(Model model, Client client, int offset) {
         super(model, "Request", true);
@@ -21,6 +24,8 @@ public class Request extends Entity {
         this.offset = offset;
         this.subRequests = new SubRequest[this.subRequestsAmount];
         this.outputTime = 0;
+        this.subReqExecTime = new ContDistNormal(model, "Execution time", 1, 0.001, false, false);
+        this.subReqExecTime.setSeed(System.currentTimeMillis());
         sendTraceNote("Write/read from offset " + getOffset()
                 + " - Client " + client.getID());
     }
@@ -33,7 +38,7 @@ public class Request extends Entity {
         return this.offset;
     }
 
-    public int getOutputTime() {
+    public double getOutputTime() {
         return this.outputTime;
     }
 
@@ -41,7 +46,7 @@ public class Request extends Entity {
         return this.subRequests;
     }
 
-    public void setOutputTime(int outputTime) {
+    public void setOutputTime(double outputTime) {
         this.outputTime = outputTime;
     }
 
@@ -50,9 +55,8 @@ public class Request extends Entity {
      * Obs: generating the sub requests with execution time as 1 time unit
      */
     public void generateSubRequests() {
-        for (int i = 0; i < subRequestsAmount; i++) {
-            subRequests[i] = new SubRequest(model, this, 1);
-        }
+        for (int i = 0; i < subRequestsAmount; i++)
+            subRequests[i] = new SubRequest(model, this, subReqExecTime.sample());
     }
 
     /**
@@ -60,7 +64,7 @@ public class Request extends Entity {
      * passed, this way, the request will only execute at certain time.
      * @param timeToStartSubReq Time that the sub requests should start
      */
-    public void sync(int timeToStartSubReq) {
+    public void sync(double timeToStartSubReq) {
         for (SubRequest subRequest : subRequests) {
             subRequest.setSendingTime(new TimeSpan(timeToStartSubReq));
         }

@@ -35,16 +35,19 @@ public class DataNode extends Entity {
      * event is considered as 1 time unit(incremented into the sub request).
      */
     public void execute() {
+        sendTraceNote("Node " + getID() + ", Sub requests amount: " + subRequestsQueue.size());
         this.nodeClock = 0.0;
         SubRequest toBeExecuted;
         while ((toBeExecuted=removeFirstSubRequest()) != null) {
+            double timeSent = toBeExecuted.getSendingTime().getTimeAsDouble();
+            if (timeSent > nodeClock)  this.nodeClock = timeSent;
             TimeSpan attendedTime = new TimeSpan(nodeClock);
             TimeSpan outputTime = new TimeSpan(nodeClock + toBeExecuted.getExecutionTime());
             toBeExecuted.setAttendedTime(attendedTime);
             toBeExecuted.setOutputTime(outputTime);
             toBeExecuted.schedule(toBeExecuted.getRequest(), this, toBeExecuted.getClient(),
                     attendedTime);
-            incrementNodeClock(toBeExecuted.getExecutionTime());
+            this.nodeClock += toBeExecuted.getExecutionTime();
         }
     }
 
@@ -55,7 +58,6 @@ public class DataNode extends Entity {
      * @param subRequest Sub request to insert
      */
     public double insertSubRequest(SubRequest subRequest) {
-        // TODO: Problem here! Sync among the clients.
         nodeClock += subRequest.getExecutionTime();
         this.subRequestsQueue.add(subRequest);
         return nodeClock;
@@ -69,7 +71,4 @@ public class DataNode extends Entity {
         return this.subRequestsQueue.poll();
     }
 
-    private void incrementNodeClock(double time) {
-        this.nodeClock += time;
-    }
 }

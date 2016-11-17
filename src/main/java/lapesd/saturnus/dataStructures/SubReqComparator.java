@@ -1,7 +1,6 @@
 package lapesd.saturnus.dataStructures;
 
 import lapesd.saturnus.event.SubRequest;
-
 import java.util.Comparator;
 
 public class SubReqComparator implements Comparator<SubRequest> {
