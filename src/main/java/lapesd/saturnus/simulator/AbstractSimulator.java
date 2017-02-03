@@ -15,15 +15,15 @@ import lapesd.saturnus.server.DataNode;
 public class AbstractSimulator extends Model {
 
     // Parameters
-    private final String FILETYPE = "SHARED";
+    private final String FILETYPE = "FPP";
     private final String ACCESSPATTERN = "SEQUENTIAL";
-    private final int TASKNUMBER = 2;
-    private final int SEGMENTSNUMBER = 5;
-    private final int STRIPECOUNT = 5;
-    private final int STRIPESIZE = 512;
-    private final int NODESAMOUNT = 9;
+    private final int TASKNUMBER = 3;
+    private final int SEGMENTSNUMBER = 2;
+    private final int NODESAMOUNT = 3;
+    private final int STRIPECOUNT = 3;
     private final int BLOCKSIZE = 2048;
     private final int REQUESTSIZE = 1024;
+    private final int STRIPESIZE = 512;
 
     private CircularList<DataNode> allDataNodes;
     private CircularList<DataNode> dataNodes;
@@ -105,7 +105,7 @@ public class AbstractSimulator extends Model {
      */
     private CircularList randomDataNodes(int nodesAmount, int stripeCount) {
         // Generate a circular list with 'STRIPECOUNT' data nodes
-        CircularList<DataNode> dataNodes = new CircularList<DataNode>();
+        CircularList<DataNode> dataNodes = new CircularList<>();
         int[] nodesIndex = MathFunctions.randomInt(nodesAmount, stripeCount);
         for (int index : nodesIndex)
             dataNodes.add(allDataNodes.get(index));
@@ -119,20 +119,20 @@ public class AbstractSimulator extends Model {
      */
     private void scheduleTasks() {
         CSVformat csvfile = new CSVformat();
+        int blockID = 0;    // Used to calculate the requests offset
         if (FILETYPE == "FPP" && ACCESSPATTERN == "SEQUENTIAL") {
-            int blockID = 0;
-            Client actualClient = clients.get(MathFunctions.randomInt(TASKNUMBER));
-            // Mantém sincronia entre os segmentos.
-            for (int i = 0; i < SEGMENTSNUMBER; i++) {
-                for (int j = 0; j < TASKNUMBER; j++) {
+            // Creates "TasksNumber" files and schedule them
+            for (Client actualClient : clients) {
+                // Select the random data nodes for each file
+                this.dataNodes = randomDataNodes(NODESAMOUNT, STRIPECOUNT);
+                for (int j = 0; j < SEGMENTSNUMBER; j++) {
                     Block block = new Block(this, actualClient, blockID);
                     actualClient.writeBlock(block, this.dataNodes);
                     blockID++;
                 }
             }
         } else if(FILETYPE == "SHARED" && ACCESSPATTERN == "SEQUENTIAL") {
-            int blockID = 0;
-            // Mantém sincronia entre os segmentos.
+            // One single file, with all the clients working on it
             for (int i = 0; i < SEGMENTSNUMBER; i++) {
                 for (Client actualClient : clients) {
                     Block block = new Block(this, actualClient, blockID);
@@ -141,6 +141,6 @@ public class AbstractSimulator extends Model {
                 }
             }
         }
-
     }
+
 }

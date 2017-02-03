@@ -24,12 +24,12 @@ public class Request extends Entity {
         this.offset = offset;
         this.subRequests = new SubRequest[this.subRequestsAmount];
         this.outputTime = 0;
-        // Note: The smallest stripe size actually considered is 64.
+        // Note: The smallest stripe size actually considered is 32.
         // If a greater size is used, the execution time is higher.
         this.subReqExecTime = new ContDistNormal(model, "Execution time", (int)(this.model.getSTRIPESIZE()/32),
                 0.001, false, false);
         this.subReqExecTime.setSeed(System.currentTimeMillis());
-        sendTraceNote("Write/read from offset " + getOffset()
+        sendTraceNote("Request scheduled. Offset " + getOffset()
                 + " - Client " + client.getID());
     }
 

@@ -28,7 +28,7 @@ public class Client extends Entity {
 
     /**
      * Receives a block to 'write' into the data servers. Beyond that,
-     * synchronize the schedule time of sub requests between requests
+     * synchronize the schedule time of sub-requests among requests
      * of the same block.
      * @param block Block to be scheduled into data servers
      * @param dataNodes The data nodes or data servers

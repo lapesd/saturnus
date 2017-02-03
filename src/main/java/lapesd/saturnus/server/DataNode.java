@@ -35,7 +35,6 @@ public class DataNode extends Entity {
      * event is considered as 1 time unit(incremented into the sub request).
      */
     public void execute() {
-        sendTraceNote("Node " + getID() + ", Sub requests amount: " + subRequestsQueue.size());
         this.nodeClock = 0.0;
         SubRequest toBeExecuted;
         while ((toBeExecuted=removeFirstSubRequest()) != null) {
@@ -45,6 +44,7 @@ public class DataNode extends Entity {
             TimeSpan outputTime = new TimeSpan(nodeClock + toBeExecuted.getExecutionTime());
             toBeExecuted.setAttendedTime(attendedTime);
             toBeExecuted.setOutputTime(outputTime);
+            skipTraceNote();    // Avoiding useless messages on trace
             toBeExecuted.schedule(toBeExecuted.getRequest(), this, toBeExecuted.getClient(),
                     attendedTime);
             this.nodeClock += toBeExecuted.getExecutionTime();
