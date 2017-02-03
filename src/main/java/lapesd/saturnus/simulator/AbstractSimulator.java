@@ -1,5 +1,6 @@
 package lapesd.saturnus.simulator;
 
+import com.opencsv.CSVWriter;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
 import lapesd.saturnus.data.Block;
@@ -28,6 +29,7 @@ public class AbstractSimulator extends Model {
     private CircularList<DataNode> allDataNodes;
     private CircularList<DataNode> dataNodes;
     private Queue<Client> clients;
+    private CSVWriter traceCSV;
 
     public AbstractSimulator() {
         super(null, "Abstract simulator", true, false);
@@ -45,6 +47,14 @@ public class AbstractSimulator extends Model {
         return REQUESTSIZE;
     }
 
+    public void setTraceCSV(CSVWriter writer) {
+        this.traceCSV = writer;
+    }
+
+    public void writeTraceLine(String[] data) {
+        this.traceCSV.writeNext(data);
+    }
+
     /**
      * Initialize all the queues, nodes and distributions used through the
      * simulator. All the initial settings are made here.
@@ -59,12 +69,10 @@ public class AbstractSimulator extends Model {
             clients.insert(new Client(this, i));
         }
         // Initialize the data nodes.
-        // Not used. Just to formalization.
+        // Not used in fact. Just to formalization.
         for (int i = 0; i < NODESAMOUNT; i++) {
             allDataNodes.add(new DataNode(this, i));
         }
-        // Select just 'STRIPECOUNT' data servers.
-        this.dataNodes = randomDataNodes(NODESAMOUNT, STRIPECOUNT);
     }
 
     /**
@@ -118,7 +126,6 @@ public class AbstractSimulator extends Model {
      * a different action.
      */
     private void scheduleTasks() {
-        CSVformat csvfile = new CSVformat();
         int blockID = 0;    // Used to calculate the requests offset
         if (FILETYPE == "FPP" && ACCESSPATTERN == "SEQUENTIAL") {
             // Creates "TasksNumber" files and schedule them
@@ -133,6 +140,8 @@ public class AbstractSimulator extends Model {
             }
         } else if(FILETYPE == "SHARED" && ACCESSPATTERN == "SEQUENTIAL") {
             // One single file, with all the clients working on it
+            // Select the random data nodes to the file
+            this.dataNodes = randomDataNodes(NODESAMOUNT, STRIPECOUNT);
             for (int i = 0; i < SEGMENTSNUMBER; i++) {
                 for (Client actualClient : clients) {
                     Block block = new Block(this, actualClient, blockID);

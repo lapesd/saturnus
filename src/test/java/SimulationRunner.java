@@ -1,37 +1,30 @@
+import com.opencsv.CSVWriter;
 import desmoj.core.simulator.Experiment;
-import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeInstant;
-import desmoj.extensions.xml.report.XMLTraceOutput;
 import lapesd.saturnus.simulator.AbstractSimulator;
-import lapesd.saturnus.simulator.CSVformat;
+
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class SimulationRunner {
 
-    public static void main(String[] args) {
-        Model model = new AbstractSimulator();
-        Experiment exp = new Experiment("Simulation");
-        XMLTraceOutput xmlTrace = new XMLTraceOutput();
+    public static void main(String[] args) throws IOException{
+        AbstractSimulator model = new AbstractSimulator();
+        Experiment experiment = new Experiment("Simulation");
 
-        // Initialize the CSV output buffer.
-        String head = "request_offset, datanode, client_id, sending_time, attended_time, output_time";
-        CSVformat.openFileToWrite("trace.csv", head);
+        // Initializes the CSV output buffer
+        String head = "request_offset datanode client_id sending_time attended_time output_time";
+        CSVWriter trace_csv = new CSVWriter(new FileWriter("experiment_trace.csv"));
+        trace_csv.writeNext(head.split(" "));
+        model.setTraceCSV(trace_csv);
 
-        // Connect both model and experiment.
-        model.connectToExperiment(exp);
-
-        // Write the trace into a XML file
-        xmlTrace.open(null, "Simulation");
-        exp.addTraceReceiver(xmlTrace);
-
-        exp.traceOn(new TimeInstant(0));
-        exp.start();
-
-        exp.report();
-
-        xmlTrace.close();
-        CSVformat.closeFile();
-
-        exp.finish();
+        // Executes the model
+        model.connectToExperiment(experiment);
+        experiment.traceOn(new TimeInstant(0));
+        experiment.start();
+        experiment.report();
+        experiment.finish();
+        trace_csv.close();
 
     }
 }

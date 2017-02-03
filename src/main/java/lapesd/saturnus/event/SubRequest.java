@@ -5,17 +5,19 @@ import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeSpan;
 import lapesd.saturnus.server.Client;
 import lapesd.saturnus.server.DataNode;
-import lapesd.saturnus.simulator.CSVformat;
+import lapesd.saturnus.simulator.AbstractSimulator;
 
 public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
 
     private Request request;
     private Client client;
     private double executionTime;
+    private AbstractSimulator model;
     private TimeSpan sendingTime, attendedTime, outputTime;
 
     public SubRequest(Model model, Request request, double executionTime) {
         super(model, "Sub request.", true);
+        this.model = (AbstractSimulator)model;
         this.request = request;
         this.executionTime = executionTime;
         this.client = request.getClient();
@@ -66,15 +68,15 @@ public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
     @Override
     public void eventRoutine(Request request, DataNode dataNode, Client client) {
         // Execute the write()/read()
-        sendTraceNote("Sub request executed - " + request
+        sendTraceNote("Sub-request being executed - " + request
                 + ", Client " + client.getID()
-                + " , DataNode " + dataNode.getID()
-                + " , Sent time " + getSendingTime());
+                + ", DataNode " + dataNode.getID()
+                + ", Sent time " + getSendingTime());
 
-        CSVformat.writeLine(request.getOffset() + ", " + dataNode.getID()
-                            + ", " + client.getID()
-                            + ", " + this.sendingTime.getTimeAsDouble()
-                            + ", " + this.attendedTime.getTimeAsDouble()
-                            + ", " + this.outputTime.getTimeAsDouble());
+        this.model.writeTraceLine((request.getOffset() + "," + dataNode.getID()
+                                    + "," + client.getID()
+                                    + "," + getSendingTime().getTimeAsDouble()
+                                    + "," + getAttendedTime().getTimeAsDouble()
+                                    + "," + getOutputTime().getTimeAsDouble()).split(","));
     }
 }
