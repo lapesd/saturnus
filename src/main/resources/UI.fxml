@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -20,7 +21,7 @@
       <Label layoutX="11.0" layoutY="253.0" prefHeight="24.0" prefWidth="113.0" text="Access pattern:" />
       <ChoiceBox fx:id="fileType" layoutX="129.0" layoutY="224.0" prefWidth="150.0" />
       <ChoiceBox fx:id="accessPattern" layoutX="129.0" layoutY="256.0" prefWidth="150.0" />
-      <Button fx:id="startButton" layoutX="12.0" layoutY="298.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="128.0" text="Start" />
+      <Button fx:id="startButton" layoutX="60.0" layoutY="603.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="128.0" text="Start" />
       <TextField fx:id="numberTasks" layoutX="129.0" layoutY="8.0" prefHeight="25.0" prefWidth="128.0" />
       <TextField fx:id="numberSegments" layoutX="129.0" layoutY="40.0" prefHeight="25.0" prefWidth="128.0" />
       <TextField fx:id="numberDataNodes" layoutX="129.0" layoutY="71.0" prefHeight="25.0" prefWidth="128.0" />
@@ -28,5 +29,12 @@
       <TextField fx:id="requestSize" layoutX="129.0" layoutY="132.0" prefHeight="25.0" prefWidth="128.0" />
       <TextField fx:id="stripeSize" layoutX="129.0" layoutY="162.0" prefHeight="25.0" prefWidth="128.0" />
       <TextField fx:id="stripeCount" layoutX="129.0" layoutY="193.0" prefHeight="25.0" prefWidth="128.0" />
+      <Label layoutX="11.0" layoutY="308.0" prefHeight="25.0" prefWidth="64.0" text="Output:" textOverrun="LEADING_ELLIPSIS">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <TextArea fx:id="consoleOutput" editable="false" layoutX="64.0" layoutY="333.0" prefHeight="246.0" prefWidth="431.0" />
+      <Button fx:id="clearButton" layoutX="215.0" layoutY="603.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="128.0" text="Clear" />
    </children>
 </AnchorPane>

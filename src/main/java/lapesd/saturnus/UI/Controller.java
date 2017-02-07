@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import lapesd.saturnus.simulator.SimulationController;
@@ -21,7 +22,11 @@ import java.util.ResourceBundle;
 public class Controller implements Initializable {
 
     @FXML
+    public TextArea consoleOutput;
+    @FXML
     private Button startButton;
+    @FXML
+    private Button clearButton;
     @FXML
     private TextField numberTasks;
     @FXML
@@ -52,20 +57,8 @@ public class Controller implements Initializable {
         stripeCount.addEventFilter(KeyEvent.KEY_TYPED, numericValidation());
         fileType.setItems(FXCollections.observableArrayList("File per Process", "Shared"));
         accessPattern.setItems(FXCollections.observableArrayList("Sequential", "Random"));
-        startButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                try {
-                    String fType = (String)fileType.getValue();
-                    String aPattern = (String)accessPattern.getValue();
-                    SimulationController.initSimulation(getTextFieldValues(), fType, aPattern);
-                } catch (NumberFormatException e) {
-                    System.out.println("One or more parameters have an invalid input!");
-                } catch (IOException e) {
-                    System.out.printf("IOException on class 'SimulationController'.");
-                }
-            }
-        });
+        startButton.setOnAction(startButtonHandler());
+        clearButton.setOnAction(clearButtonHandler());
     }
 
 
@@ -93,7 +86,7 @@ public class Controller implements Initializable {
      * numbers, erasing letters.
      * @return The event handler.
      */
-    public EventHandler<KeyEvent> numericValidation() {
+    private EventHandler<KeyEvent> numericValidation() {
         return new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -107,6 +100,32 @@ public class Controller implements Initializable {
                 } else {
                     event.consume();
                 }
+            }
+        };
+    }
+
+    private EventHandler<ActionEvent> startButtonHandler() {
+        return new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                try {
+                    String fType = (String)fileType.getValue();
+                    String aPattern = (String)accessPattern.getValue();
+                    SimulationController.initSimulation(consoleOutput, getTextFieldValues(), fType, aPattern);
+                } catch (NumberFormatException e) {
+                    consoleOutput.appendText("One or more parameters have an invalid input!\n");
+                } catch (IOException e) {
+                    consoleOutput.appendText("IOException on class 'SimulationController'.\n");
+                }
+            }
+        };
+    }
+
+    private EventHandler<ActionEvent> clearButtonHandler() {
+        return new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                consoleOutput.clear();
             }
         };
     }
