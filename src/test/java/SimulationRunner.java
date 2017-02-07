@@ -16,7 +16,7 @@ public class SimulationRunner {
         String head = "request_offset datanode client_id sending_time attended_time output_time";
         CSVWriter trace_csv = new CSVWriter(new FileWriter("experiment_trace.csv"));
         trace_csv.writeNext(head.split(" "));
-        model.setTraceCSV(trace_csv);
+        model.traceCSV(trace_csv);
 
         // Executes the model
         model.connectToExperiment(experiment);

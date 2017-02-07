@@ -10,15 +10,15 @@ import java.util.Map;
 
 public class SimulationController {
 
-    public static void initSimulation(Map parameters) throws IOException{
-        AbstractSimulator model = new AbstractSimulator();
+    public static void initSimulation(Map parameters, String fType, String aPattern) throws IOException{
+        AbstractSimulator model = new AbstractSimulator(parameters, fType, aPattern);
         Experiment experiment = new Experiment("Simulation");
 
         // Initializes the CSV output buffer
         String head = "request_offset datanode client_id sending_time attended_time output_time";
         CSVWriter trace_csv = new CSVWriter(new FileWriter("experiment_trace.csv"));
         trace_csv.writeNext(head.split(" "));
-        model.setTraceCSV(trace_csv);
+        model.traceCSV(trace_csv);
 
         // Executes the model
         model.connectToExperiment(experiment);

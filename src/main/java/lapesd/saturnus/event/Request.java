@@ -20,7 +20,7 @@ public class Request extends Entity {
         super(model, "Request", true);
         this.model = (AbstractSimulator)model;
         this.client = client;
-        this.subRequestsAmount = this.model.getREQUESTSIZE()/ this.model.getSTRIPESIZE();
+        this.subRequestsAmount = this.model.parameter("requestSize")/ this.model.parameter("stripeSize");
         this.offset = offset;
         this.subRequests = new SubRequest[this.subRequestsAmount];
         this.outputTime = 0;
@@ -78,7 +78,7 @@ public class Request extends Entity {
         // Note: The smallest stripe size actually considered is 32.
         // If a greater size is used, the execution time is higher.
         this.subReqExecTime = new ContDistNormal(model, "Execution time",
-                (int)(this.model.getSTRIPESIZE()/32), 0.001, false, false);
+                (int)(this.model.parameter("stripeSize")/32), 0.001, false, false);
         this.subReqExecTime.setSeed(System.currentTimeMillis());
     }
 }

@@ -43,20 +43,22 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL fxmlFileLocation, ResourceBundle resources) {
-        numberTasks.addEventFilter(KeyEvent.KEY_TYPED, numeric_Validation());
-        numberSegments.addEventFilter(KeyEvent.KEY_TYPED, numeric_Validation());
-        numberDataNodes.addEventFilter(KeyEvent.KEY_TYPED, numeric_Validation());
-        blockSize.addEventFilter(KeyEvent.KEY_TYPED, numeric_Validation());
-        requestSize.addEventFilter(KeyEvent.KEY_TYPED, numeric_Validation());
-        stripeSize.addEventFilter(KeyEvent.KEY_TYPED, numeric_Validation());
-        stripeCount.addEventFilter(KeyEvent.KEY_TYPED, numeric_Validation());
+        numberTasks.addEventFilter(KeyEvent.KEY_TYPED, numericValidation());
+        numberSegments.addEventFilter(KeyEvent.KEY_TYPED, numericValidation());
+        numberDataNodes.addEventFilter(KeyEvent.KEY_TYPED, numericValidation());
+        blockSize.addEventFilter(KeyEvent.KEY_TYPED, numericValidation());
+        requestSize.addEventFilter(KeyEvent.KEY_TYPED, numericValidation());
+        stripeSize.addEventFilter(KeyEvent.KEY_TYPED, numericValidation());
+        stripeCount.addEventFilter(KeyEvent.KEY_TYPED, numericValidation());
         fileType.setItems(FXCollections.observableArrayList("File per Process", "Shared"));
         accessPattern.setItems(FXCollections.observableArrayList("Sequential", "Random"));
         startButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 try {
-                    SimulationController.initSimulation(getTextFieldValues());
+                    String fType = (String)fileType.getValue();
+                    String aPattern = (String)accessPattern.getValue();
+                    SimulationController.initSimulation(getTextFieldValues(), fType, aPattern);
                 } catch (NumberFormatException e) {
                     System.out.println("One or more parameters have an invalid input!");
                 } catch (IOException e) {
@@ -91,7 +93,7 @@ public class Controller implements Initializable {
      * numbers, erasing letters.
      * @return The event handler.
      */
-    public EventHandler<KeyEvent> numeric_Validation() {
+    public EventHandler<KeyEvent> numericValidation() {
         return new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {

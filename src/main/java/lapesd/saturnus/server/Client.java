@@ -34,7 +34,7 @@ public class Client extends Entity {
      * @param dataNodes The data nodes or data servers
      */
     public void writeBlock(Block block, CircularList dataNodes) {
-        block.generateRequests(block.getBlockID() * model.getBLOCKSIZE());
+        block.generateRequests(block.getBlockID() * model.parameter("blockSize"));
         Queue<Request> requests = block.getRequests();
         for (Request actualRequest : requests) {
             actualRequest.generateSubRequests();

@@ -8,6 +8,9 @@ import lapesd.saturnus.dataStructures.CircularList;
 import lapesd.saturnus.math.MathFunctions;
 import lapesd.saturnus.server.Client;
 import lapesd.saturnus.server.DataNode;
+import org.apache.commons.collections.map.HashedMap;
+
+import java.util.Map;
 
 /**
  * The "base" of the simulator. Has all methods to handle with the events,
@@ -15,39 +18,40 @@ import lapesd.saturnus.server.DataNode;
  */
 public class AbstractSimulator extends Model {
 
-    // Parameters
-    private final String FILETYPE = "FPP";
-    private final String ACCESSPATTERN = "SEQUENTIAL";
-    private final int TASKNUMBER = 3;
-    private final int SEGMENTSNUMBER = 2;
-    private final int NODESAMOUNT = 3;
-    private final int STRIPECOUNT = 3;
-    private final int BLOCKSIZE = 2048;
-    private final int REQUESTSIZE = 1024;
-    private final int STRIPESIZE = 512;
-
+    private Map<String, Integer> parameters;
+    private String fileType, accessPattern;
     private CircularList<DataNode> allDataNodes;
     private CircularList<DataNode> dataNodes;
     private Queue<Client> clients;
     private CSVWriter traceCSV;
 
     public AbstractSimulator() {
+        // Pre defined parameters, for test purpose only!
         super(null, "Abstract simulator", true, false);
+        parameters = new HashedMap();
+        parameters.put("numberTasks", 3);
+        parameters.put("numberSegments", 2);
+        parameters.put("numberDataNodes", 3);
+        parameters.put("blockSize", 2048);
+        parameters.put("requestSize", 1024);
+        parameters.put("stripeSize", 512);
+        parameters.put("stripeCount", 3);
+        fileType = "File per Process";
+        accessPattern = "Sequential";
     }
 
-    public int getSTRIPESIZE() {
-        return STRIPESIZE;
+    public AbstractSimulator(Map parameters, String fileType, String accessPattern) {
+        super(null, "Abstract simulator", true, false);
+        this.parameters = parameters;
+        this.fileType = fileType;
+        this.accessPattern = accessPattern;
     }
 
-    public int getBLOCKSIZE() {
-        return BLOCKSIZE;
+    public int parameter(String desiredParam) {
+        return parameters.get(desiredParam);
     }
 
-    public int getREQUESTSIZE() {
-        return REQUESTSIZE;
-    }
-
-    public void setTraceCSV(CSVWriter writer) {
+    public void traceCSV(CSVWriter writer) {
         this.traceCSV = writer;
     }
 
@@ -65,12 +69,12 @@ public class AbstractSimulator extends Model {
         this.clients = new Queue<>(this, "Clients", true, true);
 
         // Initialize the Clients.
-        for (int i = 0; i < TASKNUMBER; i++) {
+        for (int i = 0; i < parameter("numberTasks"); i++) {
             clients.insert(new Client(this, i));
         }
         // Initialize the data nodes.
         // Not used in fact. Just to formalization.
-        for (int i = 0; i < NODESAMOUNT; i++) {
+        for (int i = 0; i < parameter("numberDataNodes"); i++) {
             allDataNodes.add(new DataNode(this, i));
         }
     }
@@ -127,22 +131,24 @@ public class AbstractSimulator extends Model {
      */
     private void scheduleTasks() {
         int blockID = 0;    // Used to calculate the requests offset
-        if (FILETYPE == "FPP" && ACCESSPATTERN == "SEQUENTIAL") {
+        if (fileType.equals("File per Process") && accessPattern.equals("Sequential")) {
             // Creates "TasksNumber" files and schedule them
             for (Client actualClient : clients) {
                 // Select the random data nodes for each file
-                this.dataNodes = randomDataNodes(NODESAMOUNT, STRIPECOUNT);
-                for (int j = 0; j < SEGMENTSNUMBER; j++) {
+                this.dataNodes = randomDataNodes(parameter("numberDataNodes")
+                        , parameter("stripeCount"));
+                for (int j = 0; j < parameter("numberSegments"); j++) {
                     Block block = new Block(this, actualClient, blockID);
                     actualClient.writeBlock(block, this.dataNodes);
                     blockID++;
                 }
             }
-        } else if(FILETYPE == "SHARED" && ACCESSPATTERN == "SEQUENTIAL") {
+        } else if(fileType.equals("Shared") && accessPattern.equals("Sequential")) {
             // One single file, with all the clients working on it
             // Select the random data nodes to the file
-            this.dataNodes = randomDataNodes(NODESAMOUNT, STRIPECOUNT);
-            for (int i = 0; i < SEGMENTSNUMBER; i++) {
+            this.dataNodes = randomDataNodes(parameter("numberDataNodes")
+                    , parameter("stripeCount"));
+            for (int i = 0; i < parameter("numberSegments"); i++) {
                 for (Client actualClient : clients) {
                     Block block = new Block(this, actualClient, blockID);
                     actualClient.writeBlock(block, this.dataNodes);

@@ -20,7 +20,7 @@ public class Block extends Entity {
         this.client = client;
         this.blockID = blockID;
         this.requests = new Queue<>(model, "Requests", false, false);
-        this.requestsPerBlock = this.model.getBLOCKSIZE()/this.model.getREQUESTSIZE();
+        this.requestsPerBlock = this.model.parameter("blockSize")/this.model.parameter("requestSize");
     }
 
     public int getBlockID() { return this.blockID; }
@@ -31,7 +31,7 @@ public class Block extends Entity {
 
     public void generateRequests(int firstRequestOffset) {
         for (int i = 0; i < requestsPerBlock; i++) {
-            int offset = firstRequestOffset + (i * model.getREQUESTSIZE());
+            int offset = firstRequestOffset + (i * model.parameter("requestSize"));
             requests.insert(new Request(model, client, offset));
         }
     }
