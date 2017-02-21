@@ -10,7 +10,7 @@ import java.io.IOException;
 
 @Controller
 public class RequestsController {
-    
+
     @PostMapping("/start")
     public String startSimulation(@RequestBody MultiValueMap<String, String> formData) throws IOException{
         // TODO: Check if the map is not empty;
