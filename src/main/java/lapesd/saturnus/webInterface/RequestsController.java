@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
 
@@ -16,5 +17,10 @@ public class RequestsController {
         // TODO: Check if the map is not empty;
         SimulationController.initSimulation(formData.toSingleValueMap());
         return "simulation";
+    }
+
+    @RequestMapping("/about")
+    public String aboutPage() {
+        return "about";
     }
 }
