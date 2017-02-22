@@ -1,6 +1,6 @@
 body {
     height: 100%;
-    margin-top: 0 !important;
+    margin: 0 !important;
     top: 0;
     left: 0;
     background-color: lightgray;
@@ -21,7 +21,7 @@ body {
 }
 
 #bottom_bar{
-    position: absolute;
+    position: fixed;
     bottom: 0;
     left:0;
     width:100%;
@@ -34,9 +34,9 @@ ul {
     position: static;
     left: 0;
     top: 0;
-    margin-left: none;
-    margin-top: none;
+    height: 60px;
     list-style-type: none;
+    margin: 0;
     padding: 0;
     overflow: hidden;
     background-color: #333;
@@ -48,12 +48,16 @@ li {
 
 li a {
     display: block;
-    color: white;
+    color: whitesmoke;
     text-align: center;
-    padding: 14px 16px;
+    padding: 20px 16px;
     text-decoration: none;
 }
 
 li a:hover:not(.active) {
     background-color: #111;
+}
+
+img {
+    margin-right: 16px;
 }
