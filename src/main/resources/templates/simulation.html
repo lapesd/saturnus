@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Saturnus: Simulation</title>
+    <link rel="stylesheet" type="text/css" href="css/simulation.css" media="screen" />
+</head>
+
+<body>
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <div style="margin-left: 48%">
+            <h2 style="color: whitesmoke; margin-top: 14px">Saturnus</h2>
+        </div>
+    </ul>
+
+    <h2>Report:</h2>
+
+    <tr>
+        <td th:text="${message}"></td>
+    </tr>
+
+    <div id="bottom_bar">
+        <a href="https://github.com/lapesd">
+            <img src="lapesd.png" align="right" style="height: 60px"/>
+        </a>
+        <a href="http://ufsc.br/">
+            <img src="ufsc.svg" align="right" style="height:56px;"/>
+        </a>
+    </div>
+</body>
+
+</html>
