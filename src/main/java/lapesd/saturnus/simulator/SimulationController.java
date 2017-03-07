@@ -8,10 +8,11 @@ import org.apache.commons.collections.map.HashedMap;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 public class SimulationController {
 
-    public static void initSimulation(Map<String, String> parameters) throws IOException{
+    public PriorityQueue initSimulation(Map<String, String> parameters) throws IOException{
         // Pre-processing the parameters
         Map<String, Integer> numericParams = new HashedMap();
         numericParams.put("numberTasks", Integer.parseInt(parameters.get("numberTasks")));
@@ -34,18 +35,13 @@ public class SimulationController {
 
         // Executes the model
         model.connectToExperiment(experiment);
-        //output.appendText("--------------------------------------------------\n");
-        //output.appendText("Simulation starts at simulation time: 0.000000\n");
-        //output.appendText("Please wait...\n");
         experiment.traceOn(new TimeInstant(0));
         experiment.start();
         experiment.report();
         experiment.finish();
         trace_csv.close();
 
-        //output.appendText("Simulation stopped.\nLast request was attended at simulation time: " +
-        //        experiment.getSimClock().getTime().getTimeAsDouble() + "\n");
-
+        return model.getAllSubRequests();
     }
 
 }

@@ -5,6 +5,7 @@ import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeSpan;
 import lapesd.saturnus.dataStructures.SubReqComparator;
 import lapesd.saturnus.event.SubRequest;
+import lapesd.saturnus.simulator.AbstractSimulator;
 
 import java.util.PriorityQueue;
 
@@ -12,10 +13,12 @@ public class DataNode extends Entity {
 
     private double nodeClock;
     private int ID;
+    private AbstractSimulator model;
     private PriorityQueue<SubRequest> subRequestsQueue;
 
     public DataNode(Model model, int dataNodeID) {
         super(model, "DataNode", true);
+        this.model = (AbstractSimulator)model;
         this.nodeClock = 0.0;
         this.ID = dataNodeID;
         this.subRequestsQueue = new PriorityQueue<>(new SubReqComparator());
@@ -48,6 +51,7 @@ public class DataNode extends Entity {
             toBeExecuted.schedule(toBeExecuted.getRequest(), this, toBeExecuted.getClient(),
                     attendedTime);
             this.nodeClock += toBeExecuted.getExecutionTime();
+            this.model.saveSubRequest(toBeExecuted);
         }
     }
 

@@ -5,12 +5,14 @@ import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
 import lapesd.saturnus.data.Block;
 import lapesd.saturnus.dataStructures.CircularList;
+import lapesd.saturnus.dataStructures.ComparatorAttTime;
+import lapesd.saturnus.event.SubRequest;
 import lapesd.saturnus.math.MathFunctions;
 import lapesd.saturnus.server.Client;
 import lapesd.saturnus.server.DataNode;
-import org.apache.commons.collections.map.HashedMap;
 
 import java.util.Map;
+import java.util.PriorityQueue;
 
 /**
  * The "base" of the simulator. Has all methods to handle with the events,
@@ -23,28 +25,15 @@ public class AbstractSimulator extends Model {
     private CircularList<DataNode> allDataNodes;
     private CircularList<DataNode> dataNodes;
     private Queue<Client> clients;
+    private PriorityQueue<SubRequest> allSubRequests;
     private CSVWriter traceCSV;
-
-    public AbstractSimulator() {
-        // Pre defined parameters, for test purpose only!
-        super(null, "Abstract simulator", true, false);
-        parameters = new HashedMap();
-        parameters.put("numberTasks", 3);
-        parameters.put("numberSegments", 2);
-        parameters.put("numberDataNodes", 3);
-        parameters.put("blockSize", 2048);
-        parameters.put("requestSize", 1024);
-        parameters.put("stripeSize", 512);
-        parameters.put("stripeCount", 3);
-        fileType = "File per Process";
-        accessPattern = "Sequential";
-    }
 
     public AbstractSimulator(Map parameters, String fileType, String accessPattern) {
         super(null, "Abstract simulator", true, false);
         this.parameters = parameters;
         this.fileType = fileType;
         this.accessPattern = accessPattern;
+        this.allSubRequests = new PriorityQueue<>(new ComparatorAttTime());
     }
 
     public int parameter(String desiredParam) {
@@ -58,6 +47,20 @@ public class AbstractSimulator extends Model {
     public void writeTraceLine(String[] data) {
         this.traceCSV.writeNext(data);
     }
+
+    public PriorityQueue getAllSubRequests() {
+        return this.allSubRequests;
+    }
+
+    /**
+     * Save a sub-request executed on the queue. Can be used to return informations
+     * about them.
+     * @param subReq To be added
+     */
+    public void saveSubRequest(SubRequest subReq) {
+        allSubRequests.add(subReq);
+    }
+
 
     /**
      * Initialize all the queues, nodes and distributions used through the
