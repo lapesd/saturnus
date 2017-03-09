@@ -5,14 +5,13 @@ import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
 import lapesd.saturnus.data.Block;
 import lapesd.saturnus.dataStructures.CircularList;
-import lapesd.saturnus.dataStructures.ComparatorAttTime;
 import lapesd.saturnus.event.SubRequest;
 import lapesd.saturnus.math.MathFunctions;
 import lapesd.saturnus.server.Client;
 import lapesd.saturnus.server.DataNode;
 
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.PriorityQueue;
 
 /**
  * The "base" of the simulator. Has all methods to handle with the events,
@@ -25,7 +24,7 @@ public class AbstractSimulator extends Model {
     private CircularList<DataNode> allDataNodes;
     private CircularList<DataNode> dataNodes;
     private Queue<Client> clients;
-    private PriorityQueue<SubRequest> allSubRequests;
+    private ArrayList<SubRequest> allSubRequests;
     private CSVWriter traceCSV;
 
     public AbstractSimulator(Map parameters, String fileType, String accessPattern) {
@@ -33,7 +32,7 @@ public class AbstractSimulator extends Model {
         this.parameters = parameters;
         this.fileType = fileType;
         this.accessPattern = accessPattern;
-        this.allSubRequests = new PriorityQueue<>(new ComparatorAttTime());
+        this.allSubRequests = new ArrayList<>();
     }
 
     public int parameter(String desiredParam) {
@@ -48,7 +47,7 @@ public class AbstractSimulator extends Model {
         this.traceCSV.writeNext(data);
     }
 
-    public PriorityQueue getAllSubRequests() {
+    public ArrayList<SubRequest> getAllSubRequests() {
         return this.allSubRequests;
     }
 

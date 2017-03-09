@@ -14,9 +14,11 @@ public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
     private double executionTime;
     private AbstractSimulator model;
     private TimeSpan sendingTime, attendedTime, outputTime;
+    private String actionDescription;
+    private DataNode dataNodeExecuted;
 
     public SubRequest(Model model, Request request, double executionTime) {
-        super(model, "Sub request.", true);
+        super(model, "Sub-request.", true);
         this.model = (AbstractSimulator)model;
         this.request = request;
         this.executionTime = executionTime;
@@ -59,6 +61,14 @@ public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
         this.attendedTime = attendedTime;
     }
 
+    public String getActionDescription() {
+        return this.actionDescription;
+    }
+
+    public DataNode getDataNodeExecuted() {
+        return this.dataNodeExecuted;
+    }
+
     /**
      * Routine called when the sub request is scheduled. Send a message into
      * the trace report with the sub request info.
@@ -78,5 +88,8 @@ public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
                                     + "," + getSendingTime().getTimeAsDouble()
                                     + "," + getAttendedTime().getTimeAsDouble()
                                     + "," + getOutputTime().getTimeAsDouble()).split(","));
+
+        this.actionDescription = "Default - Sub-request executed.";
+        this.dataNodeExecuted = dataNode;
     }
 }

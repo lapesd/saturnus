@@ -3,16 +3,17 @@ package lapesd.saturnus.simulator;
 import com.opencsv.CSVWriter;
 import desmoj.core.simulator.Experiment;
 import desmoj.core.simulator.TimeInstant;
+import lapesd.saturnus.event.SubRequest;
 import org.apache.commons.collections.map.HashedMap;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.PriorityQueue;
 
 public class SimulationController {
 
-    public PriorityQueue initSimulation(Map<String, String> parameters) throws IOException{
+    public ArrayList<SubRequest> initSimulation(Map<String, String> parameters) throws IOException{
         // Pre-processing the parameters
         Map<String, Integer> numericParams = new HashedMap();
         numericParams.put("numberTasks", Integer.parseInt(parameters.get("numberTasks")));

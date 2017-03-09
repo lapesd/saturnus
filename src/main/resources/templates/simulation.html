@@ -18,9 +18,25 @@
 
     <h2>Report:</h2>
 
-    <tr>
-        <td th:text="${message}"></td>
-    </tr>
+    <table>
+        <tr>
+            <th>Time Sent</th>
+            <th>Time Attended</th>
+            <th>Request offset</th>
+            <th>Client ID</th>
+            <th>Data node ID</th>
+            <th>Action</th>
+        </tr>
+
+        <tr th:each="info : ${eventInfo}">
+            <td th:text="${info.getSendingTime()}"> </td>
+            <td th:text="${info.getAttendedTime()}"> </td>
+            <td th:text="${info.request.getOffset()}"> </td>
+            <td th:text="${info.getClient().getID()}"> </td>
+            <td th:text="${info.getDataNodeExecuted().getID()}"> </td>
+            <td th:text="${info.getActionDescription()}"> </td>
+        </tr>
+    </table>
 
     <div id="bottom_bar">
         <a href="https://github.com/lapesd">

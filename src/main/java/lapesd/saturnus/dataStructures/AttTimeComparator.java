@@ -4,7 +4,7 @@ import lapesd.saturnus.event.SubRequest;
 
 import java.util.Comparator;
 
-public class ComparatorAttTime implements Comparator<SubRequest> {
+public class AttTimeComparator implements Comparator<SubRequest> {
     @Override
     public int compare(SubRequest o, SubRequest t1) {
         double oTime = o.getAttendedTime().getTimeAsDouble();

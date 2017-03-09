@@ -52,3 +52,9 @@ li a:hover:not(.active) {
 img {
     margin-right: 16px;
 }
+
+th {
+    padding-right: 18px;
+    padding-bottom: 18px;
+    font-size: large;
+}
