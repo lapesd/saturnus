@@ -19,8 +19,7 @@ public class RequestsController {
     public String startSimulation(Model model, @RequestBody MultiValueMap<String, String> formData) throws IOException{
         // TODO: Check if the map is not empty;
         SimulationController simulation = new SimulationController();
-        ArrayList subRequestsInfo;
-        subRequestsInfo = simulation.initSimulation(formData.toSingleValueMap());
+        ArrayList subRequestsInfo = simulation.initSimulation(formData.toSingleValueMap());
         subRequestsInfo.sort(new AttTimeComparator());
         model.addAttribute("eventInfo", subRequestsInfo);
         return "simulation";
