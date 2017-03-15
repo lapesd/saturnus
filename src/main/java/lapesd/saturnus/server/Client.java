@@ -13,35 +13,26 @@ public class Client extends Entity {
 
     private AbstractSimulator model;
     private int ID;
-    private double lastRequestOutputTime;
+    private Queue<Request> queueOfRequests;
+    private CircularList<DataNode> dataNodesList;
 
     public Client(Model model, int clientID) {
         super(model, "Client", true);
         this.model = (AbstractSimulator)model;
         this.ID = clientID;
-        this.lastRequestOutputTime = 0.0;
+        this.queueOfRequests = new Queue<Request>(model, "", false, false);
     }
 
     public int getID() {
         return this.ID;
     }
 
-    /**
-     * Receives a block to 'write' into the data servers. Beyond that,
-     * synchronize the schedule time of sub-requests among requests
-     * of the same block.
-     * @param block Block to be scheduled into data servers
-     * @param dataNodes The data nodes or data servers
-     */
-    public void writeBlock(Block block, CircularList dataNodes) {
-        block.generateRequests(block.getBlockID() * model.parameter("blockSize"));
-        Queue<Request> requests = block.getRequests();
-        for (Request actualRequest : requests) {
-            actualRequest.generateSubRequests();
-            actualRequest.sync(lastRequestOutputTime);
-            sendSubRequests(dataNodes, actualRequest);
-            lastRequestOutputTime = actualRequest.getOutputTime();
-        }
+    public CircularList getDataNodesList() {
+        return this.dataNodesList;
+    }
+
+    public Queue getQueueOfRequests() {
+        return this.queueOfRequests;
     }
 
     /**
@@ -53,9 +44,50 @@ public class Client extends Entity {
     public void sendSubRequests(CircularList<DataNode> dataNodesList, Request request) {
         for (SubRequest subRequest : request.getSubRequests()) {
             DataNode nodeToSchedule = dataNodesList.next();
-            double nodeClock = nodeToSchedule.insertSubRequest(subRequest);
-            if (nodeClock > request.getOutputTime())
-                request.setOutputTime(nodeToSchedule.getNodeClock());
+            nodeToSchedule.insertSubRequest(subRequest);
+        }
+    }
+
+    /**
+     * Send sub-requests from a request to data nodes. Just a simplification.
+     * Assumes that the request to be sent is the first of the client queue.
+     * @param dataNodesList Sequence of nodes to send
+     */
+    public void sendRequestFromQueue(CircularList<DataNode> dataNodesList) {
+        sendSubRequests(dataNodesList, queueOfRequests.first());
+    }
+
+    /**
+     * Receives the signal, indicating that some sub-requests has ended its
+     * execution.
+     * @param request 'father' of the sub-request executed
+     * @param subReqOutput Output time of the executed event
+     */
+    public void sendFinishedSignal(Request request, double subReqOutput) {
+        boolean sendNewRequest = request.ReqExecutedSignal();
+        if (sendNewRequest) {
+            queueOfRequests.removeFirst();
+            if (queueOfRequests.size() == 0) return;
+            Request toSend = queueOfRequests.first();
+            toSend.sync(subReqOutput);
+            sendSubRequests(dataNodesList, toSend);
+        }
+    }
+
+    /**
+     * Creates the requests and sub-requests of one data block and store them
+     * in the client internal queue.
+     * @param block Block
+     * @param dataNodes Sequence to execute the requests
+     */
+    public void generateBlockRequests(Block block, CircularList dataNodes) {
+        // TODO: Save this list on the constructor method.
+        this.dataNodesList = dataNodes;
+        block.generateRequests(block.getBlockID() * model.parameter("blockSize"));
+        Queue<Request> requests = block.getRequests();
+        for (Request actualRequest : requests) {
+            actualRequest.generateSubRequests();
+            queueOfRequests.insert(actualRequest);
         }
     }
 }

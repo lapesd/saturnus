@@ -9,7 +9,7 @@ import lapesd.saturnus.simulator.AbstractSimulator;
 
 public class Request extends Entity {
 
-    private int subRequestsAmount, offset;
+    private int subRequestsAmount, offset, requestsExecuted;
     private double outputTime;
     private AbstractSimulator model;
     private Client client;
@@ -53,8 +53,10 @@ public class Request extends Entity {
      * Obs: generating the sub requests with execution time as 1 time unit
      */
     public void generateSubRequests() {
-        for (int i = 0; i < subRequestsAmount; i++)
+        for (int i = 0; i < subRequestsAmount; i++) {
             subRequests[i] = new SubRequest(model, this, subReqExecTime.sample());
+        }
+        this.requestsExecuted = 0;
     }
 
     /**
@@ -80,5 +82,15 @@ public class Request extends Entity {
         this.subReqExecTime = new ContDistNormal(model, "Execution time",
                 (int)(this.model.parameter("stripeSize")/32), 0.001, false, false);
         this.subReqExecTime.setSeed(System.currentTimeMillis());
+    }
+
+
+    /**
+     * Receives the signal of 'end of execution', from one sub-request.
+     * @return true if all the sub-requests have been executed
+     */
+    public boolean ReqExecutedSignal() {
+        requestsExecuted += 1;
+        return (requestsExecuted == subRequestsAmount);
     }
 }

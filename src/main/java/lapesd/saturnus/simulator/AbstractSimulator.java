@@ -22,7 +22,7 @@ public class AbstractSimulator extends Model {
     private Map<String, Integer> parameters;
     private String fileType, accessPattern;
     private CircularList<DataNode> allDataNodes;
-    private CircularList<DataNode> dataNodes;
+    private CircularList<DataNode> dataNodes;       // Can be declared inside the scheduleTasks()
     private Queue<Client> clients;
     private ArrayList<SubRequest> allSubRequests;
     private CSVWriter traceCSV;
@@ -74,8 +74,7 @@ public class AbstractSimulator extends Model {
         for (int i = 0; i < parameter("numberTasks"); i++) {
             clients.insert(new Client(this, i));
         }
-        // Initialize the data nodes.
-        // Not used in fact. Just to formalization.
+        // Initialize all the data nodes, even the unused.
         for (int i = 0; i < parameter("numberDataNodes"); i++) {
             allDataNodes.add(new DataNode(this, i));
         }
@@ -106,8 +105,16 @@ public class AbstractSimulator extends Model {
      * scheduled at each node(sub request, request, etc.)
      */
     private void executeAllNodes() {
-        for (DataNode auxiliar : dataNodes)
-            auxiliar.execute();
+        // Initial requests being sent
+        for (Client auxiliar : clients)
+            auxiliar.sendRequestFromQueue(auxiliar.getDataNodesList());
+
+        // Execute all the requests
+        while (!allRequestsExecuted()) {
+            for (DataNode auxiliar : allDataNodes) {
+                auxiliar.executeOneSubRequest();
+            }
+        }
     }
 
     /**
@@ -127,6 +134,18 @@ public class AbstractSimulator extends Model {
     }
 
     /**
+     * Checks if there's some requests executing or to be executed on the system
+     * @return If all the requests have been executed
+     */
+    private boolean allRequestsExecuted() {
+        for (Client auxiliar : clients) {
+            if (auxiliar.getQueueOfRequests().size() > 0)
+                return false;
+        }
+        return true;
+    }
+
+    /**
      * Schedule the nodes according the parameters 'FILETYPE' and
      * 'ACCESPATTERN'. To all 4 combinations, the simulator needs to perform
      * a different action.
@@ -137,23 +156,23 @@ public class AbstractSimulator extends Model {
             // Creates "TasksNumber" files and schedule them
             for (Client actualClient : clients) {
                 // Select the random data nodes for each file
-                this.dataNodes = randomDataNodes(parameter("numberDataNodes")
-                        , parameter("stripeCount"));
+                dataNodes = randomDataNodes(parameter("numberDataNodes"),
+                        parameter("stripeCount"));
                 for (int j = 0; j < parameter("numberSegments"); j++) {
                     Block block = new Block(this, actualClient, blockID);
-                    actualClient.writeBlock(block, this.dataNodes);
+                    actualClient.generateBlockRequests(block, dataNodes);
                     blockID++;
                 }
             }
         } else if(fileType.equals("Shared") && accessPattern.equals("Sequential")) {
             // One single file, with all the clients working on it
             // Select the random data nodes to the file
-            this.dataNodes = randomDataNodes(parameter("numberDataNodes")
-                    , parameter("stripeCount"));
+            dataNodes = randomDataNodes(parameter("numberDataNodes"),
+                    parameter("stripeCount"));
             for (int i = 0; i < parameter("numberSegments"); i++) {
                 for (Client actualClient : clients) {
                     Block block = new Block(this, actualClient, blockID);
-                    actualClient.writeBlock(block, this.dataNodes);
+                    actualClient.generateBlockRequests(block, dataNodes);
                     blockID++;
                 }
             }
