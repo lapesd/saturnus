@@ -75,28 +75,3 @@ public class DataNode extends Entity {
         toBeExecuted.getClient().sendFinishedSignal(toBeExecuted.getRequest(), this.nodeClock);
     }
 }
-
-/*
-    Ideia:
-    Cada cliente tem um vetor com todas as suas requisições. Apenas a primeira é enviada.
-    Assim, quando os nodos de dados terminam de executar as sub-requisições dessa requisição,
-     eles enviam seus tempos para o cliente que as enviou.
-    Após o cliente notar que todas as sub-requisições da requisição 0 foram executadas, ele envia
-     a próxima, já sincronizada, e manda os nodo executarem novamente. NOTA: Pode ser que a criação
-     de uma função para executar apenas uma requisição ou sub-requisição nos nodos seja útil.
-    Quando não existirem mais requisições em nenhuma máquina cliente, o simulador deve encerrar a sua
-     execução.
-
-     'Protótipo': execOneSub() ->
-        Agenda a execução da sub-request (Talvez manter a fila e pegar a primeira dela)
-        Pega o relógio
-        Envia para o cliente, 'dono' da sub-req um sinal que ela foi executada e o output time dela.
-        Cliente verifica se precisa enviar uma nova pros nodos ou ainda não.
-
-     Nota: gerar todos os blocos de cada cliente, enviar apenas a primeira requisição. Deixar eles
-     armazenados (talvez)
-     Nota2: requisições podem ter um atributo sub-reqs exacutadas, para manter apenas um vetor nos
-     clientes
-     Nota3: abstractSimulator pode ter um método que fica mandando os nodos executarem uma sub-request
-     enquanto ainda tiver alguma na fila ou alguma para ser enviada pelos clientes (vectorOfRequests.size)
- */
