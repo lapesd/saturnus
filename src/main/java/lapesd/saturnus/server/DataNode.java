@@ -59,19 +59,21 @@ public class DataNode extends Entity {
     public void executeOneSubRequest() {
         // TODO: To generate synchrony among nodes. Node 'wait' until the sending time arrives.
         SubRequest toBeExecuted = removeFirstSubRequest();
-        double execTime = toBeExecuted.getExecutionTime();
-        TimeSpan attendedTime = new TimeSpan(nodeClock);
-        TimeSpan outputTime = new TimeSpan(nodeClock + execTime);
-        toBeExecuted.setAttendedTime(attendedTime);
-        toBeExecuted.setOutputTime(outputTime);
+        if (toBeExecuted != null) {
+            double execTime = toBeExecuted.getExecutionTime();
+            TimeSpan attendedTime = new TimeSpan(nodeClock);
+            TimeSpan outputTime = new TimeSpan(nodeClock + execTime);
+            toBeExecuted.setAttendedTime(attendedTime);
+            toBeExecuted.setOutputTime(outputTime);
 
-        skipTraceNote();    // Avoiding useless messages on trace
-        toBeExecuted.schedule(toBeExecuted.getRequest(), this, toBeExecuted.getClient(),
-                attendedTime);
-        this.nodeClock += execTime;
-        this.model.saveSubRequest(toBeExecuted);
+            skipTraceNote();    // Avoiding useless messages on trace
+            toBeExecuted.schedule(toBeExecuted.getRequest(), this, toBeExecuted.getClient(),
+                    attendedTime);
+            this.nodeClock += execTime;
+            this.model.saveSubRequest(toBeExecuted);
 
-        // Send request ID and the sub-request output time.
-        toBeExecuted.getClient().sendFinishedSignal(toBeExecuted.getRequest(), this.nodeClock);
+            // Send request ID and the sub-request output time.
+            toBeExecuted.getClient().sendFinishedSignal(toBeExecuted.getRequest(), this.nodeClock);
+        }
     }
 }
