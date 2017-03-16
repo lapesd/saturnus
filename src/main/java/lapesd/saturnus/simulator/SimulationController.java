@@ -37,7 +37,12 @@ public class SimulationController {
         // Executes the model
         model.connectToExperiment(experiment);
         experiment.traceOn(new TimeInstant(0));
+
+        // Measuring the execution time
+        double startTime = System.nanoTime();
         experiment.start();
+        double finalExecutionTime = (System.nanoTime() - startTime) * 1e-9;
+
         experiment.report();
         experiment.finish();
         trace_csv.close();
