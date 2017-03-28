@@ -57,10 +57,13 @@ public class DataNode extends Entity {
      * time unit(incremented into the sub request).
      */
     public void executeOneSubRequest() {
-        // TODO: To generate synchrony among nodes. Node 'wait' until the sending time arrives.
         SubRequest toBeExecuted = removeFirstSubRequest();
         if (toBeExecuted != null) {
             double execTime = toBeExecuted.getExecutionTime();
+            double sendingTime = toBeExecuted.getSendingTime().getTimeAsDouble();
+            // Used to sync. among data nodes.
+            // i.e. If the sending time is greater than the node clock, update it.
+            this.nodeClock = (nodeClock < sendingTime) ? sendingTime : nodeClock;
             TimeSpan attendedTime = new TimeSpan(nodeClock);
             TimeSpan outputTime = new TimeSpan(nodeClock + execTime);
             toBeExecuted.setAttendedTime(attendedTime);
