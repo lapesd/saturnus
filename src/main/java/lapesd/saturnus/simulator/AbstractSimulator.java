@@ -21,8 +21,6 @@ import java.util.Vector;
  */
 public class AbstractSimulator extends Model {
 
-    // TODO: Implement the Random access pattern!
-
     private Map<String, Integer> parameters;
     private String fileType, accessPattern;
     private CircularList<DataNode> allDataNodes;
@@ -74,8 +72,11 @@ public class AbstractSimulator extends Model {
         this.clients = new Queue<>(this, "Clients", true, true);
 
         // Initialize the Clients.
+        CircularList<DataNode> dataNodesChoice;
         for (int i = 0; i < parameter("numberTasks"); i++) {
-            clients.insert(new Client(this, i));
+            dataNodesChoice = randomDataNodes(parameter("numberDataNodes"),
+                    parameter("stripeCount"));
+            clients.insert(new Client(this, i, dataNodesChoice));
         }
         // Initialize all the data nodes, even the unused.
         for (int i = 0; i < parameter("numberDataNodes"); i++) {
@@ -161,16 +162,12 @@ public class AbstractSimulator extends Model {
     }
 
     private void randomTasks() {
-        CircularList<DataNode> dataNodesChoice;
-        int blockID = 0;
-
         if (fileType.equals("File per Process")) {
+            int blockID = 0;
             // One file for each client - Random access
             for (Client actualClient : this.clients) {
                 Vector<Block> blocks = new Vector();
 
-                dataNodesChoice = randomDataNodes(parameter("numberDataNodes"),
-                        parameter("stripeCount"));
                 for (int i = 0; i < parameter("numberSegments"); i++) {
                     Block createdBlock = new Block(this, actualClient, blockID);
                     blocks.add(createdBlock);
@@ -180,38 +177,31 @@ public class AbstractSimulator extends Model {
                 Collections.shuffle(blocks);
 
                 for (Block actualBlock : blocks)
-                    actualClient.generateBlockRequests(actualBlock, dataNodesChoice);
+                    actualClient.generateBlockRequests(actualBlock);
             }
         } else if (fileType.equals("Shared")) {
-
+            // TODO
         }
     }
 
     private void sequentialTasks() {
-        CircularList<DataNode> dataNodesChoice;
-        int blockID = 0;
-
         if (fileType.equals("File per Process")) {
             // One file for each client - Sequential access
+            int blockID = 0;
             for (Client actualClient : this.clients) {
-                // Select the random data nodes for each file
-                dataNodesChoice = randomDataNodes(parameter("numberDataNodes"),
-                        parameter("stripeCount"));
                 for (int j = 0; j < parameter("numberSegments"); j++) {
                     Block block = new Block(this, actualClient, blockID);
-                    actualClient.generateBlockRequests(block, dataNodesChoice);
+                    actualClient.generateBlockRequests(block);
                     blockID++;
                 }
             }
         } else if (fileType.equals("Shared")) {
             // One single file, with all the clients working on it
-            // Select the random data nodes to the file
-            dataNodesChoice = randomDataNodes(parameter("numberDataNodes"),
-                    parameter("stripeCount"));
+            int blockID = 0;
             for (int i = 0; i < parameter("numberSegments"); i++) {
                 for (Client actualClient : this.clients) {
                     Block block = new Block(this, actualClient, blockID);
-                    actualClient.generateBlockRequests(block, dataNodesChoice);
+                    actualClient.generateBlockRequests(block);
                     blockID++;
                 }
             }

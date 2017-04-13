@@ -16,10 +16,11 @@ public class Client extends Entity {
     private Queue<Request> queueOfRequests;
     private CircularList<DataNode> dataNodesList;
 
-    public Client(Model model, int clientID) {
+    public Client(Model model, int clientID, CircularList dataServersChoice) {
         super(model, "Client", true);
         this.model = (AbstractSimulator)model;
         this.ID = clientID;
+        this.dataNodesList = dataServersChoice;
         this.queueOfRequests = new Queue<>(model, "", false, false);
     }
 
@@ -78,11 +79,8 @@ public class Client extends Entity {
      * Creates the requests and sub-requests of one data block and store them
      * in the client internal queue.
      * @param block Block
-     * @param dataNodes Sequence to execute the requests
      */
-    public void generateBlockRequests(Block block, CircularList dataNodes) {
-        // TODO: Save this list on the constructor method.
-        this.dataNodesList = dataNodes;
+    public void generateBlockRequests(Block block) {
         block.generateRequests(block.getBlockID() * model.parameter("blockSize"));
         Queue<Request> requests = block.getRequests();
         for (Request actualRequest : requests) {
