@@ -11,7 +11,9 @@ import lapesd.saturnus.server.Client;
 import lapesd.saturnus.server.DataNode;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * The "base" of the simulator. Has all methods to handle with the events,
@@ -19,10 +21,11 @@ import java.util.Map;
  */
 public class AbstractSimulator extends Model {
 
+    // TODO: Implement the Random access pattern!
+
     private Map<String, Integer> parameters;
     private String fileType, accessPattern;
     private CircularList<DataNode> allDataNodes;
-    private CircularList<DataNode> dataNodes;       // Can be declared inside the scheduleTasks()
     private Queue<Client> clients;
     private ArrayList<SubRequest> allSubRequests;
     private CSVWriter traceCSV;
@@ -151,28 +154,64 @@ public class AbstractSimulator extends Model {
      * a different action.
      */
     private void scheduleTasks() {
-        int blockID = 0;    // Used to calculate the requests offset
-        if (fileType.equals("File per Process") && accessPattern.equals("Sequential")) {
-            // Creates "TasksNumber" files and schedule them
-            for (Client actualClient : clients) {
+        if (accessPattern.equals("Sequential"))
+            sequentialTasks();
+        else if(accessPattern.equals("Random"))
+            randomTasks();
+    }
+
+    private void randomTasks() {
+        CircularList<DataNode> dataNodesChoice;
+        int blockID = 0;
+
+        if (fileType.equals("File per Process")) {
+            // One file for each client - Random access
+            for (Client actualClient : this.clients) {
+                Vector<Block> blocks = new Vector();
+
+                dataNodesChoice = randomDataNodes(parameter("numberDataNodes"),
+                        parameter("stripeCount"));
+                for (int i = 0; i < parameter("numberSegments"); i++) {
+                    Block createdBlock = new Block(this, actualClient, blockID);
+                    blocks.add(createdBlock);
+                    blockID++;
+                }
+
+                Collections.shuffle(blocks);
+
+                for (Block actualBlock : blocks)
+                    actualClient.generateBlockRequests(actualBlock, dataNodesChoice);
+            }
+        } else if (fileType.equals("Shared")) {
+
+        }
+    }
+
+    private void sequentialTasks() {
+        CircularList<DataNode> dataNodesChoice;
+        int blockID = 0;
+
+        if (fileType.equals("File per Process")) {
+            // One file for each client - Sequential access
+            for (Client actualClient : this.clients) {
                 // Select the random data nodes for each file
-                dataNodes = randomDataNodes(parameter("numberDataNodes"),
+                dataNodesChoice = randomDataNodes(parameter("numberDataNodes"),
                         parameter("stripeCount"));
                 for (int j = 0; j < parameter("numberSegments"); j++) {
                     Block block = new Block(this, actualClient, blockID);
-                    actualClient.generateBlockRequests(block, dataNodes);
+                    actualClient.generateBlockRequests(block, dataNodesChoice);
                     blockID++;
                 }
             }
-        } else if(fileType.equals("Shared") && accessPattern.equals("Sequential")) {
+        } else if (fileType.equals("Shared")) {
             // One single file, with all the clients working on it
             // Select the random data nodes to the file
-            dataNodes = randomDataNodes(parameter("numberDataNodes"),
+            dataNodesChoice = randomDataNodes(parameter("numberDataNodes"),
                     parameter("stripeCount"));
             for (int i = 0; i < parameter("numberSegments"); i++) {
-                for (Client actualClient : clients) {
+                for (Client actualClient : this.clients) {
                     Block block = new Block(this, actualClient, blockID);
-                    actualClient.generateBlockRequests(block, dataNodes);
+                    actualClient.generateBlockRequests(block, dataNodesChoice);
                     blockID++;
                 }
             }

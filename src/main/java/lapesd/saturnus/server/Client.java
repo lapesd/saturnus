@@ -20,7 +20,7 @@ public class Client extends Entity {
         super(model, "Client", true);
         this.model = (AbstractSimulator)model;
         this.ID = clientID;
-        this.queueOfRequests = new Queue<Request>(model, "", false, false);
+        this.queueOfRequests = new Queue<>(model, "", false, false);
     }
 
     public int getID() {
