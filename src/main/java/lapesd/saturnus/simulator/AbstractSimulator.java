@@ -10,10 +10,7 @@ import lapesd.saturnus.math.MathFunctions;
 import lapesd.saturnus.server.Client;
 import lapesd.saturnus.server.DataNode;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * The "base" of the simulator. Has all methods to handle with the events,
@@ -71,16 +68,17 @@ public class AbstractSimulator extends Model {
         this.allDataNodes = new CircularList<>();
         this.clients = new Queue<>(this, "Clients", true, true);
 
+        // Initialize all the data nodes, even the unused.
+        for (int i = 0; i < parameter("numberDataNodes"); i++) {
+            allDataNodes.add(new DataNode(this, i));
+        }
+
         // Initialize the Clients.
         CircularList<DataNode> dataNodesChoice;
         for (int i = 0; i < parameter("numberTasks"); i++) {
             dataNodesChoice = randomDataNodes(parameter("numberDataNodes"),
                     parameter("stripeCount"));
             clients.insert(new Client(this, i, dataNodesChoice));
-        }
-        // Initialize all the data nodes, even the unused.
-        for (int i = 0; i < parameter("numberDataNodes"); i++) {
-            allDataNodes.add(new DataNode(this, i));
         }
     }
 
@@ -180,7 +178,26 @@ public class AbstractSimulator extends Model {
                     actualClient.generateBlockRequests(actualBlock);
             }
         } else if (fileType.equals("Shared")) {
-            // TODO
+            // One single file, with all the clients working on it
+            int blockID = 0;
+            int clientsSize = this.clients.size();
+            int numberSegments = parameter("numberSegments");
+
+            // Generates all the blocks
+            Block[][] blocks = new Block[clientsSize][numberSegments];
+            for (int i = 0; i < clientsSize; i++) {
+                for (int j = 0; j < numberSegments; j++) {
+                    Block block = new Block(this, this.clients.get(i), blockID);
+                    blocks[i][j] = block;
+                    blockID++;
+                }
+                
+                Collections.shuffle(Arrays.asList(blocks[i]));
+
+                for (int j = 0; j < numberSegments; j++)
+                    this.clients.get(i).generateBlockRequests(blocks[i][j]);
+            }
+
         }
     }
 
