@@ -1,11 +1,11 @@
-package lapesd.saturnus.server;
+package lapesd.saturnus.model.server;
 
 import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeSpan;
-import lapesd.saturnus.dataStructures.SubReqComparator;
-import lapesd.saturnus.event.SubRequest;
-import lapesd.saturnus.simulator.AbstractSimulator;
+import lapesd.saturnus.model.dataStructures.SubReqComparator;
+import lapesd.saturnus.model.event.SubRequest;
+import lapesd.saturnus.control.AbstractSimulator;
 
 import java.util.PriorityQueue;
 

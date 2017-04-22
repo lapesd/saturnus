@@ -1,7 +1,7 @@
 package lapesd.saturnus.webInterface;
 
-import lapesd.saturnus.dataStructures.AttTimeComparator;
-import lapesd.saturnus.simulator.SimulationController;
+import lapesd.saturnus.model.dataStructures.AttTimeComparator;
+import lapesd.saturnus.control.SimulationController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;

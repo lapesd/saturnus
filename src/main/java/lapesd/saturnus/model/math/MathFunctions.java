@@ -1,19 +1,11 @@
-package lapesd.saturnus.math;
+package lapesd.saturnus.model.math;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 public class MathFunctions {
-
-    private static Random rand = new Random();
-
-    public static int randomInt(int maxValue) {
-        return rand.nextInt(maxValue);
-    }
-
     public static int[] randomInt(int maxValue, int numberOfIntegers) {
-        ArrayList<Integer> range = new ArrayList<Integer>();
+        ArrayList<Integer> range = new ArrayList<>();
         int[] randomNumbers = new int[numberOfIntegers];
         for (int i = 0; i < maxValue; i++) {
             range.add(i);
@@ -23,9 +15,5 @@ public class MathFunctions {
             randomNumbers[i] = range.get(i);
         }
         return randomNumbers;
-    }
-
-    public static int ceilInt(double value) {
-        return (int)Math.ceil(value);
     }
 }

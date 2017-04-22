@@ -1,14 +1,14 @@
-package lapesd.saturnus.simulator;
+package lapesd.saturnus.control;
 
 import com.opencsv.CSVWriter;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
-import lapesd.saturnus.data.Block;
-import lapesd.saturnus.dataStructures.CircularList;
-import lapesd.saturnus.event.SubRequest;
-import lapesd.saturnus.math.MathFunctions;
-import lapesd.saturnus.server.Client;
-import lapesd.saturnus.server.DataNode;
+import lapesd.saturnus.model.data.Block;
+import lapesd.saturnus.model.dataStructures.CircularList;
+import lapesd.saturnus.model.event.SubRequest;
+import lapesd.saturnus.model.math.MathFunctions;
+import lapesd.saturnus.model.server.Client;
+import lapesd.saturnus.model.server.DataNode;
 
 import java.util.*;
 
@@ -191,7 +191,7 @@ public class AbstractSimulator extends Model {
                     blocks[i][j] = block;
                     blockID++;
                 }
-                
+
                 Collections.shuffle(Arrays.asList(blocks[i]));
 
                 for (int j = 0; j < numberSegments; j++)

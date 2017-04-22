@@ -1,6 +1,6 @@
-package lapesd.saturnus.dataStructures;
+package lapesd.saturnus.model.dataStructures;
 
-import lapesd.saturnus.event.SubRequest;
+import lapesd.saturnus.model.event.SubRequest;
 
 import java.util.Comparator;
 

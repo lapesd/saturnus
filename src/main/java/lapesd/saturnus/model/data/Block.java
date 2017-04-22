@@ -1,11 +1,11 @@
-package lapesd.saturnus.data;
+package lapesd.saturnus.model.data;
 
 import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
-import lapesd.saturnus.event.Request;
-import lapesd.saturnus.server.Client;
-import lapesd.saturnus.simulator.AbstractSimulator;
+import lapesd.saturnus.model.event.Request;
+import lapesd.saturnus.model.server.Client;
+import lapesd.saturnus.control.AbstractSimulator;
 
 public class Block extends Entity {
     private int blockID, requestsPerBlock;

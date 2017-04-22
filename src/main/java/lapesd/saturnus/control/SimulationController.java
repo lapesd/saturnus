@@ -1,9 +1,9 @@
-package lapesd.saturnus.simulator;
+package lapesd.saturnus.control;
 
 import com.opencsv.CSVWriter;
 import desmoj.core.simulator.Experiment;
 import desmoj.core.simulator.TimeInstant;
-import lapesd.saturnus.event.SubRequest;
+import lapesd.saturnus.model.event.SubRequest;
 import org.apache.commons.collections.map.HashedMap;
 
 import java.io.FileWriter;

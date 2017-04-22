@@ -1,13 +1,13 @@
-package lapesd.saturnus.server;
+package lapesd.saturnus.model.server;
 
 import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
-import lapesd.saturnus.data.Block;
-import lapesd.saturnus.dataStructures.CircularList;
-import lapesd.saturnus.event.Request;
-import lapesd.saturnus.event.SubRequest;
-import lapesd.saturnus.simulator.AbstractSimulator;
+import lapesd.saturnus.model.data.Block;
+import lapesd.saturnus.model.dataStructures.CircularList;
+import lapesd.saturnus.model.event.Request;
+import lapesd.saturnus.model.event.SubRequest;
+import lapesd.saturnus.control.AbstractSimulator;
 
 public class Client extends Entity {
 

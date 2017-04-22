@@ -1,11 +1,11 @@
-package lapesd.saturnus.event;
+package lapesd.saturnus.model.event;
 
 import desmoj.core.dist.ContDistNormal;
 import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeSpan;
-import lapesd.saturnus.server.Client;
-import lapesd.saturnus.simulator.AbstractSimulator;
+import lapesd.saturnus.model.server.Client;
+import lapesd.saturnus.control.AbstractSimulator;
 
 public class Request extends Entity {
 

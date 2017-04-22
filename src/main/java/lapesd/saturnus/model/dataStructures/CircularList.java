@@ -1,4 +1,4 @@
-package lapesd.saturnus.dataStructures;
+package lapesd.saturnus.model.dataStructures;
 
 import java.util.ArrayList;
 

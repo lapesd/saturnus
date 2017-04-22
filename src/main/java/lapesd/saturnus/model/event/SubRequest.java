@@ -1,11 +1,11 @@
-package lapesd.saturnus.event;
+package lapesd.saturnus.model.event;
 
 import desmoj.core.simulator.EventOf3Entities;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeSpan;
-import lapesd.saturnus.server.Client;
-import lapesd.saturnus.server.DataNode;
-import lapesd.saturnus.simulator.AbstractSimulator;
+import lapesd.saturnus.model.server.Client;
+import lapesd.saturnus.model.server.DataNode;
+import lapesd.saturnus.control.AbstractSimulator;
 
 public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
 

@@ -1,4 +1,4 @@
-package lapesd.saturnus.data;
+package lapesd.saturnus.model.data;
 
 import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
