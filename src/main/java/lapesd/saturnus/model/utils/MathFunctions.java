@@ -1,4 +1,4 @@
-package lapesd.saturnus.model.math;
+package lapesd.saturnus.model.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;

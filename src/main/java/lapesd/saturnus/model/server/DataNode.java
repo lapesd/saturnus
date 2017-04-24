@@ -73,7 +73,7 @@ public class DataNode extends Entity {
             toBeExecuted.schedule(toBeExecuted.getRequest(), this, toBeExecuted.getClient(),
                     attendedTime);
             this.nodeClock += execTime;
-            this.model.saveSubRequest(toBeExecuted);
+            this.model.setSubRequestExecuted(toBeExecuted);
 
             // Send request ID and the sub-request output time.
             toBeExecuted.getClient().sendFinishedSignal(toBeExecuted.getRequest(), this.nodeClock);

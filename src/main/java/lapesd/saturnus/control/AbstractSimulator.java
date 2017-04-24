@@ -1,15 +1,14 @@
 package lapesd.saturnus.control;
 
-import com.opencsv.CSVWriter;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.Queue;
 import lapesd.saturnus.model.data.Block;
 import lapesd.saturnus.model.dataStructures.CircularList;
 import lapesd.saturnus.model.event.SubRequest;
-import lapesd.saturnus.model.math.MathFunctions;
+import lapesd.saturnus.model.utils.MathFunctions;
+import lapesd.saturnus.model.utils.CSVWriter;
 import lapesd.saturnus.model.server.Client;
 import lapesd.saturnus.model.server.DataNode;
-
 import java.util.*;
 
 /**
@@ -22,40 +21,15 @@ public class AbstractSimulator extends Model {
     private String fileType, accessPattern;
     private CircularList<DataNode> allDataNodes;
     private Queue<Client> clients;
-    private ArrayList<SubRequest> allSubRequests;
-    private CSVWriter traceCSV;
+    private ArrayList<SubRequest> executedSubRequests;
+    private CSVWriter reportWriter;
 
     public AbstractSimulator(Map parameters, String fileType, String accessPattern) {
         super(null, "Abstract simulator", true, false);
         this.parameters = parameters;
         this.fileType = fileType;
         this.accessPattern = accessPattern;
-        this.allSubRequests = new ArrayList<>();
-    }
-
-    public int parameter(String desiredParam) {
-        return parameters.get(desiredParam);
-    }
-
-    public void traceCSV(CSVWriter writer) {
-        this.traceCSV = writer;
-    }
-
-    public void writeTraceLine(String[] data) {
-        this.traceCSV.writeNext(data);
-    }
-
-    public ArrayList<SubRequest> getAllSubRequests() {
-        return this.allSubRequests;
-    }
-
-    /**
-     * Save a sub-request executed on the queue. Can be used to return informations
-     * about them.
-     * @param subReq To be added
-     */
-    public void saveSubRequest(SubRequest subReq) {
-        allSubRequests.add(subReq);
+        this.executedSubRequests = new ArrayList<>();
     }
 
 
@@ -68,12 +42,12 @@ public class AbstractSimulator extends Model {
         this.allDataNodes = new CircularList<>();
         this.clients = new Queue<>(this, "Clients", true, true);
 
-        // Initialize all the data nodes, even the unused.
+        // Initialize all the data nodes
         for (int i = 0; i < parameter("numberDataNodes"); i++) {
             allDataNodes.add(new DataNode(this, i));
         }
 
-        // Initialize the Clients.
+        // Initialize the Clients
         CircularList<DataNode> dataNodesChoice;
         for (int i = 0; i < parameter("numberTasks"); i++) {
             dataNodesChoice = randomDataNodes(parameter("numberDataNodes"),
@@ -100,6 +74,32 @@ public class AbstractSimulator extends Model {
     public String description() {
         return "Saturnus is an event based discrete simulator for parallel " +
                 "file systems.";
+    }
+
+
+    public int parameter(String desiredParam) {
+        return parameters.get(desiredParam);
+    }
+
+    public void setReportWriter(CSVWriter writer) {
+        this.reportWriter = writer;
+    }
+
+    public CSVWriter getReportWriter() {
+        return this.reportWriter;
+    }
+
+    public ArrayList<SubRequest> getExecutedSubRequests() {
+        return this.executedSubRequests;
+    }
+
+    /**
+     * Save a sub-request executed on the queue. Can be used to return information
+     * about them.
+     * @param subReq To be added
+     */
+    public void setSubRequestExecuted(SubRequest subReq) {
+        this.executedSubRequests.add(subReq);
     }
 
     /**
@@ -148,8 +148,8 @@ public class AbstractSimulator extends Model {
     }
 
     /**
-     * Schedule the nodes according the parameters 'FILETYPE' and
-     * 'ACCESPATTERN'. To all 4 combinations, the simulator needs to perform
+     * Schedule the nodes according the parameters 'fileType' and
+     * 'accessPattern'. To all 4 combinations, the simulator performs
      * a different action.
      */
     private void scheduleTasks() {

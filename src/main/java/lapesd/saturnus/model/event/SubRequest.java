@@ -78,16 +78,14 @@ public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
     @Override
     public void eventRoutine(Request request, DataNode dataNode, Client client) {
         // Execute the write()/read()
-        sendTraceNote("Sub-request being executed - " + request
-                + ", Client " + client.getID()
-                + ", DataNode " + dataNode.getID()
-                + ", Sent time " + getSendingTime());
-
-        this.model.writeTraceLine((request.getOffset() + "," + dataNode.getID()
-                                    + "," + client.getID()
-                                    + "," + getSendingTime().getTimeAsDouble()
-                                    + "," + getAttendedTime().getTimeAsDouble()
-                                    + "," + getOutputTime().getTimeAsDouble()).split(","));
+        model.getReportWriter().writeNext((request.getOffset() + "," +
+                dataNode.getID() + "," +
+                client.getID()   + "," +
+                getSendingTime().getTimeAsDouble() + "," +
+                getAttendedTime().getTimeAsDouble()+ "," +
+                getOutputTime().getTimeAsDouble()
+                ).split(",")
+        );
 
         this.actionDescription = "Default - Sub-request executed.";
         this.dataNodeExecuted = dataNode;

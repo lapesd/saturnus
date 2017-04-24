@@ -1,11 +1,9 @@
 package lapesd.saturnus.control;
 
-import com.opencsv.CSVWriter;
 import desmoj.core.simulator.Experiment;
-import desmoj.core.simulator.TimeInstant;
 import lapesd.saturnus.model.event.SubRequest;
+import lapesd.saturnus.model.utils.CSVWriter;
 import org.apache.commons.collections.map.HashedMap;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,30 +22,33 @@ public class SimulationController {
         numericParams.put("stripeSize", Integer.parseInt(parameters.get("stripeSize")));
         numericParams.put("stripeCount", Integer.parseInt(parameters.get("stripeCount")));
 
-        AbstractSimulator model = new AbstractSimulator(numericParams, parameters.get("fileType"), parameters.get("accessPattern"));
+        // Creating the model
+        AbstractSimulator model = new AbstractSimulator(
+                numericParams,
+                parameters.get("fileType"),
+                parameters.get("accessPattern")
+        );
+
         Experiment experiment = new Experiment("Simulation");
         experiment.setSilent(true);
 
         // Initializes the CSV output buffer
         String head = "request_offset datanode client_id sending_time attended_time output_time";
-        CSVWriter trace_csv = new CSVWriter(new FileWriter("experiment_trace.csv"));
-        trace_csv.writeNext(head.split(" "));
-        model.traceCSV(trace_csv);
+        CSVWriter trace = new CSVWriter(
+                new FileWriter("experiment_trace.csv"),
+                head
+        );
+        model.setReportWriter(trace);
 
         // Executes the model
         model.connectToExperiment(experiment);
-        experiment.traceOn(new TimeInstant(0));
-
-        // Measuring the execution time
-        double startTime = System.nanoTime();
         experiment.start();
-        double finalExecutionTime = (System.nanoTime() - startTime) * 1e-9;
 
-        experiment.report();
+        // End of simulation
         experiment.finish();
-        trace_csv.close();
+        model.getReportWriter().close();
 
-        return model.getAllSubRequests();
+        return model.getExecutedSubRequests();
     }
 
 }
