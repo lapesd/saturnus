@@ -13,8 +13,4 @@ public class CircularList<T> extends ArrayList<T> {
         this.lastAccess++;
         return get(this.lastAccess % size());
     }
-
-    public void resetNextPointer() {
-        this.lastAccess = -1;
-    }
 }

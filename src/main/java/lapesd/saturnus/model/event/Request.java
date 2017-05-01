@@ -26,8 +26,7 @@ public class Request extends Entity {
         this.offset = offset;
         this.subRequests = new SubRequest[this.subRequestsAmount];
         this.outputTime = 0;
-        generateSubRequestDist(this.model);
-        sendTraceNote("Request scheduled. Offset " + getOffset() + " - Client " + client.getID());
+        generateSubRequestDist();
     }
 
     public Client getClient() {
@@ -76,13 +75,10 @@ public class Request extends Entity {
      * Creates the distribution to calculate the execution time for each
      * sub-request. Using a normal distribution, with standard deviation equals
      * to 0.01%. The mean is calculated based on the Stripe Size.
-     * @param model Main model
      */
-    private void generateSubRequestDist(Model model) {
-        // Note: The smallest stripe size actually considered is 32.
-        // If a greater size is used, the execution time is higher.
+    private void generateSubRequestDist() {
         this.subReqExecTime = new ContDistNormal(model, "Execution time",
-                (int)(this.model.parameter("stripeSize")/32), 0.001, false, false);
+                model.parameter("stripeSize"), 0.001, false, false);
         this.subReqExecTime.setSeed(System.currentTimeMillis());
     }
 
