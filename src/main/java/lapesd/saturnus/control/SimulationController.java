@@ -13,14 +13,14 @@ public class SimulationController {
 
     public ArrayList<SubRequest> initSimulation(Map<String, String> parameters) throws IOException{
         // Pre-processing the parameters
-        Map<String, Integer> numericParams = new HashedMap();
-        numericParams.put("numberTasks", Integer.parseInt(parameters.get("numberTasks")));
-        numericParams.put("numberSegments", Integer.parseInt(parameters.get("numberSegments")));
-        numericParams.put("numberDataNodes", Integer.parseInt(parameters.get("numberDataNodes")));
-        numericParams.put("blockSize", Integer.parseInt(parameters.get("blockSize")));
-        numericParams.put("requestSize", Integer.parseInt(parameters.get("requestSize")));
-        numericParams.put("stripeSize", Integer.parseInt(parameters.get("stripeSize")));
-        numericParams.put("stripeCount", Integer.parseInt(parameters.get("stripeCount")));
+        Map<String, Long> numericParams = new HashedMap();
+        numericParams.put("numberTasks", Long.parseLong(parameters.get("numberTasks")));
+        numericParams.put("numberSegments", Long.parseLong(parameters.get("numberSegments")));
+        numericParams.put("numberDataNodes", Long.parseLong(parameters.get("numberDataNodes")));
+        numericParams.put("blockSize", Long.parseLong(parameters.get("blockSize")));
+        numericParams.put("requestSize", Long.parseLong(parameters.get("requestSize")));
+        numericParams.put("stripeSize", Long.parseLong(parameters.get("stripeSize")));
+        numericParams.put("stripeCount", Long.parseLong(parameters.get("stripeCount")));
 
         // Creating the model
         AbstractSimulator model = new AbstractSimulator(

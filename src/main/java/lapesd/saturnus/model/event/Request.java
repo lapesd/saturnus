@@ -9,18 +9,20 @@ import lapesd.saturnus.control.AbstractSimulator;
 
 public class Request extends Entity {
 
-    private int subRequestsAmount, offset, requestsExecuted;
+    private int subRequestsAmount, requestsExecuted;
+    private long offset;
     private double outputTime;
     private AbstractSimulator model;
     private Client client;
     private SubRequest[] subRequests;
     private ContDistNormal subReqExecTime;
 
-    public Request(Model model, Client client, int offset) {
+    public Request(Model model, Client client, long offset) {
         super(model, "Request", true);
         this.model = (AbstractSimulator)model;
         this.client = client;
-        this.subRequestsAmount = this.model.parameter("requestSize")/ this.model.parameter("stripeSize");
+        this.subRequestsAmount = (int)(this.model.parameter("requestSize") /
+                                       this.model.parameter("stripeSize"));
         this.offset = offset;
         this.subRequests = new SubRequest[this.subRequestsAmount];
         this.outputTime = 0;
@@ -32,7 +34,7 @@ public class Request extends Entity {
         return this.client;
     }
 
-    public int getOffset() {
+    public long getOffset() {
         return this.offset;
     }
 

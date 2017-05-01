@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class MathFunctions {
-    public static int[] randomInt(int maxValue, int numberOfIntegers) {
+    public static long[] randomLong(long maxValue, long numberOfIntegers) {
         ArrayList<Integer> range = new ArrayList<>();
-        int[] randomNumbers = new int[numberOfIntegers];
+        long[] randomNumbers = new long[(int)numberOfIntegers];
         for (int i = 0; i < maxValue; i++) {
             range.add(i);
         }

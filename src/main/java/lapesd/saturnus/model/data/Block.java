@@ -8,7 +8,8 @@ import lapesd.saturnus.model.server.Client;
 import lapesd.saturnus.control.AbstractSimulator;
 
 public class Block extends Entity {
-    private int blockID, requestsPerBlock;
+    private int blockID;
+    private long requestsPerBlock;
     private Client client;
     private Queue<Request> requests;
     private AbstractSimulator model;
@@ -29,9 +30,9 @@ public class Block extends Entity {
         return this.requests;
     }
 
-    public void generateRequests(int firstRequestOffset) {
+    public void generateRequests(long firstRequestOffset) {
         for (int i = 0; i < requestsPerBlock; i++) {
-            int offset = firstRequestOffset + (i * model.parameter("requestSize"));
+            long offset = firstRequestOffset + (i * model.parameter("requestSize"));
             requests.insert(new Request(model, client, offset));
         }
     }

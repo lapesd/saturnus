@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class AbstractSimulator extends Model {
 
-    private Map<String, Integer> parameters;
+    private Map<String, Long> parameters;
     private String fileType, accessPattern;
     private CircularList<DataNode> allDataNodes;
     private Queue<Client> clients;
@@ -77,7 +77,7 @@ public class AbstractSimulator extends Model {
     }
 
 
-    public int parameter(String desiredParam) {
+    public long parameter(String desiredParam) {
         return parameters.get(desiredParam);
     }
 
@@ -126,11 +126,11 @@ public class AbstractSimulator extends Model {
      * @param stripeCount Number of nodes to be selected
      * @return A circular list with 'stripeCount' data nodes
      */
-    private CircularList randomDataNodes(int nodesAmount, int stripeCount) {
+    private CircularList randomDataNodes(long nodesAmount, long stripeCount) {
         // Generate a circular list with 'STRIPECOUNT' data nodes
         CircularList<DataNode> dataNodes = new CircularList<>();
-        int[] nodesIndex = MathFunctions.randomInt(nodesAmount, stripeCount);
-        for (int index : nodesIndex)
+        long[] nodesIndex = MathFunctions.randomLong(nodesAmount, stripeCount);
+        for (long index : nodesIndex)
             dataNodes.add(allDataNodes.get(index));
         return dataNodes;
     }
@@ -181,10 +181,10 @@ public class AbstractSimulator extends Model {
             // One single file, with all the clients working on it
             int blockID = 0;
             int clientsSize = this.clients.size();
-            int numberSegments = parameter("numberSegments");
+            long numberSegments = parameter("numberSegments");
 
             // Generates all the blocks
-            Block[][] blocks = new Block[clientsSize][numberSegments];
+            Block[][] blocks = new Block[clientsSize][(int)numberSegments];
             for (int i = 0; i < clientsSize; i++) {
                 for (int j = 0; j < numberSegments; j++) {
                     Block block = new Block(this, this.clients.get(i), blockID);
