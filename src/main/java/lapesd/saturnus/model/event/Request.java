@@ -8,7 +8,14 @@ import lapesd.saturnus.model.server.Client;
 import lapesd.saturnus.control.AbstractSimulator;
 
 public class Request extends Entity {
-
+    /**
+     * TODO: Just an idea:
+     *          Receive the request size as a parameter, when constructing this object
+     *          May help with the sub-requests amount. The same can be done inside the
+     *          Block class.
+     *
+     * TODO: Must think in a way to treat the difference of sizes.
+     */
     private int subRequestsAmount, requestsExecuted;
     private long offset;
     private double outputTime;
@@ -17,16 +24,16 @@ public class Request extends Entity {
     private SubRequest[] subRequests;
     private ContDistNormal subReqExecTime;
 
-    public Request(Model model, Client client, long offset) {
+    public Request(Model model, Client client, long offset, long requestSize) {
         super(model, "Request", true);
         this.model = (AbstractSimulator)model;
         this.client = client;
-        this.subRequestsAmount = (int)(this.model.parameter("requestSize") /
+        this.subRequestsAmount = (int)(requestSize /
                                        this.model.parameter("stripeSize"));
         this.offset = offset;
         this.subRequests = new SubRequest[this.subRequestsAmount];
         this.outputTime = 0;
-        generateSubRequestDist();
+        generateSubRequestDist(this.model.parameter("stripeSize"));
     }
 
     public Client getClient() {
@@ -76,9 +83,8 @@ public class Request extends Entity {
      * sub-request. Using a normal distribution, with standard deviation equals
      * to 0.01%. The mean is calculated based on the Stripe Size.
      */
-    private void generateSubRequestDist() {
-        this.subReqExecTime = new ContDistNormal(model, "Execution time",
-                model.parameter("stripeSize"), 0.001, false, false);
+    private void generateSubRequestDist(long mean) {
+        this.subReqExecTime = new ContDistNormal(model, "Execution time", mean, 0.001, false, false);
         this.subReqExecTime.setSeed(System.currentTimeMillis());
     }
 

@@ -6,10 +6,16 @@ import desmoj.core.simulator.Queue;
 import lapesd.saturnus.model.event.Request;
 import lapesd.saturnus.model.server.Client;
 import lapesd.saturnus.control.AbstractSimulator;
+import lapesd.saturnus.model.utils.MathFunctions;
 
 public class Block extends Entity {
+    /**
+     * TODO: Read the 'Request.java' docs
+     *  Note: Send the request size as a parameter will tell the request
+     *  how many stripes must be written.
+     */
     private int blockID;
-    private long requestsPerBlock;
+    private double requestsPerBlock;
     private Client client;
     private Queue<Request> requests;
     private AbstractSimulator model;
@@ -21,7 +27,8 @@ public class Block extends Entity {
         this.client = client;
         this.blockID = blockID;
         this.requests = new Queue<>(model, "Requests", false, false);
-        this.requestsPerBlock = this.model.parameter("blockSize")/this.model.parameter("requestSize");
+        this.requestsPerBlock = ((double)this.model.parameter("blockSize") /
+                                 (double)this.model.parameter("requestSize"));
     }
 
     public int getBlockID() { return this.blockID; }
@@ -31,9 +38,19 @@ public class Block extends Entity {
     }
 
     public void generateRequests(long firstRequestOffset) {
-        for (int i = 0; i < requestsPerBlock; i++) {
-            long offset = firstRequestOffset + (i * model.parameter("requestSize"));
-            requests.insert(new Request(model, client, offset));
+        long requestSize = model.parameter("requestSize");
+        long offset = 0;
+        for (int i = 0 ; i < (int)requestsPerBlock; i++) {
+            offset = firstRequestOffset + (i * requestSize);
+            requests.insert(new Request(model, client, offset, requestSize));
         }
+
+        double decimal = MathFunctions.getDecimalPart(requestsPerBlock);
+        if (decimal != 0) {
+            long partialRequestSize = (long)Math.ceil(decimal * requestSize);
+            long partialOffset = offset + requestSize;
+            requests.insert(new Request(model, client, partialOffset, partialRequestSize));
+        }
+
     }
 }

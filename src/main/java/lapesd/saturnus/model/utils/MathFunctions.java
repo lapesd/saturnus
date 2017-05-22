@@ -16,4 +16,8 @@ public class MathFunctions {
         }
         return randomNumbers;
     }
+
+    public static double getDecimalPart(double number) {
+        return number - (int)number;
+    }
 }
