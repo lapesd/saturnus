@@ -1,39 +1,30 @@
 package lapesd.saturnus.model.event;
 
-import desmoj.core.dist.ContDistNormal;
 import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeSpan;
-import lapesd.saturnus.model.server.Client;
 import lapesd.saturnus.control.AbstractSimulator;
+import lapesd.saturnus.model.server.Client;
+import lapesd.saturnus.model.utils.MathFunctions;
 
 public class Request extends Entity {
-    /**
-     * TODO: Just an idea:
-     *          Receive the request size as a parameter, when constructing this object
-     *          May help with the sub-requests amount. The same can be done inside the
-     *          Block class.
-     *
-     * TODO: Must think in a way to treat the difference of sizes.
-     */
-    private int subRequestsAmount, requestsExecuted;
+    private int requestsExecuted;
     private long offset;
     private double outputTime;
+    private double subRequestsAmount;
     private AbstractSimulator model;
     private Client client;
     private SubRequest[] subRequests;
-    private ContDistNormal subReqExecTime;
 
     public Request(Model model, Client client, long offset, long requestSize) {
         super(model, "Request", true);
         this.model = (AbstractSimulator)model;
         this.client = client;
-        this.subRequestsAmount = (int)(requestSize /
+        this.subRequestsAmount = ((double)requestSize /
                                        this.model.parameter("stripeSize"));
         this.offset = offset;
-        this.subRequests = new SubRequest[this.subRequestsAmount];
+        this.subRequests = new SubRequest[(int)Math.ceil(this.subRequestsAmount)];
         this.outputTime = 0;
-        generateSubRequestDist(this.model.parameter("stripeSize"));
     }
 
     public Client getClient() {
@@ -61,9 +52,17 @@ public class Request extends Entity {
      * Obs: generating the sub requests with execution time as 1 time unit
      */
     public void generateSubRequests() {
+        long stripeSize = this.model.parameter("stripeSize");
         for (int i = 0; i < subRequestsAmount; i++) {
-            subRequests[i] = new SubRequest(model, this, subReqExecTime.sample());
+            subRequests[i] = new SubRequest(model, this, stripeSize);
         }
+
+        double decimal = MathFunctions.getDecimalPart(subRequestsAmount);
+        if (decimal != 0) {
+            long partialStripeSize = (long)Math.ceil(decimal * stripeSize);
+            subRequests[(int)subRequestsAmount] = new SubRequest(model, this, partialStripeSize);
+        }
+
         this.requestsExecuted = 0;
     }
 
@@ -79,22 +78,11 @@ public class Request extends Entity {
     }
 
     /**
-     * Creates the distribution to calculate the execution time for each
-     * sub-request. Using a normal distribution, with standard deviation equals
-     * to 0.01%. The mean is calculated based on the Stripe Size.
-     */
-    private void generateSubRequestDist(long mean) {
-        this.subReqExecTime = new ContDistNormal(model, "Execution time", mean, 0.001, false, false);
-        this.subReqExecTime.setSeed(System.currentTimeMillis());
-    }
-
-
-    /**
      * Receives the signal of 'end of execution', from one sub-request.
      * @return true if all the sub-requests have been executed
      */
     public boolean ReqExecutedSignal() {
         requestsExecuted += 1;
-        return (requestsExecuted == subRequestsAmount);
+        return (requestsExecuted == Math.ceil(subRequestsAmount));
     }
 }

@@ -1,27 +1,28 @@
 package lapesd.saturnus.model.event;
 
+import desmoj.core.dist.ContDistNormal;
 import desmoj.core.simulator.EventOf3Entities;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeSpan;
+import lapesd.saturnus.control.AbstractSimulator;
 import lapesd.saturnus.model.server.Client;
 import lapesd.saturnus.model.server.DataNode;
-import lapesd.saturnus.control.AbstractSimulator;
 
 public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
 
     private Request request;
     private Client client;
-    private double executionTime;
+    private ContDistNormal executionTime;
     private AbstractSimulator model;
     private TimeSpan sendingTime, attendedTime, outputTime;
     private String actionDescription;
     private DataNode dataNodeExecuted;
 
-    public SubRequest(Model model, Request request, double executionTime) {
+    public SubRequest(Model model, Request request, long stripeSize) {
         super(model, "Sub-request.", true);
         this.model = (AbstractSimulator)model;
         this.request = request;
-        this.executionTime = executionTime;
+        generateTimeDistribution(stripeSize);
         this.client = request.getClient();
     }
 
@@ -34,7 +35,7 @@ public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
     }
 
     public double getExecutionTime() {
-        return this.executionTime;
+        return this.executionTime.sample();
     }
 
     public TimeSpan getSendingTime() {
@@ -89,5 +90,15 @@ public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
 
         this.actionDescription = "Default - Sub-request executed.";
         this.dataNodeExecuted = dataNode;
+    }
+
+    /**
+     * Creates the distribution to calculate the execution time for each
+     * sub-request. Using a normal distribution, with standard deviation equals
+     * to 0.01%. The mean is calculated based on the Stripe Size.
+     */
+    private void generateTimeDistribution(long mean) {
+        this.executionTime = new ContDistNormal(model, "Execution time", mean, 0.001, false, false);
+        this.executionTime.setSeed(System.currentTimeMillis());
     }
 }

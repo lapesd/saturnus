@@ -9,11 +9,6 @@ import lapesd.saturnus.control.AbstractSimulator;
 import lapesd.saturnus.model.utils.MathFunctions;
 
 public class Block extends Entity {
-    /**
-     * TODO: Read the 'Request.java' docs
-     *  Note: Send the request size as a parameter will tell the request
-     *  how many stripes must be written.
-     */
     private int blockID;
     private double requestsPerBlock;
     private Client client;
