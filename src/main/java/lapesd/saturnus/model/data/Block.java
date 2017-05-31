@@ -32,6 +32,11 @@ public class Block extends Entity {
         return this.requests;
     }
 
+    /**
+     * Generates all the requests of a block. If the sizes are note multiple,
+     * the last request will have a different size.
+     * @param firstRequestOffset Start of the block
+     */
     public void generateRequests(long firstRequestOffset) {
         long requestSize = model.parameter("requestSize");
         long offset = 0;

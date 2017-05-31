@@ -22,8 +22,8 @@ public class SubRequest extends EventOf3Entities<Request, DataNode, Client> {
         super(model, "Sub-request.", true);
         this.model = (AbstractSimulator)model;
         this.request = request;
-        generateTimeDistribution(stripeSize);
         this.client = request.getClient();
+        generateTimeDistribution(stripeSize);
     }
 
     public Request getRequest() {
